@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Sweep
+Comment=Modern disk cleaning utility
+Exec=sweep-gtk
+Icon=io.github.BlueManCZ.sweep
+Terminal=false
+Type=Application
+Categories=System;Utility;
+Keywords=clean;cache;disk;space;
+StartupNotify=true

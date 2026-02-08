@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=io.github.BlueManCZ.sweep
+Exec=sweep service start

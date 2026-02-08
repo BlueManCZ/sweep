@@ -1,0 +1,51 @@
+[project]
+name = "sweep"
+version = "0.1.0"
+description = "A modern, modular disk cleaning application for Linux"
+requires-python = ">=3.10"
+license = "GPL-3.0-only"
+authors = [{ name = "Sweep Contributors" }]
+readme = "README.md"
+keywords = ["disk", "cleaner", "cache", "cleanup", "linux"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Environment :: X11 Applications :: GTK",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Systems Administration",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "click>=8.0",
+    "dbus-next>=0.2.3",
+]
+
+[project.optional-dependencies]
+gtk = ["PyGObject>=3.42"]
+dev = ["pytest>=7.0", "pytest-cov"]
+
+[project.scripts]
+sweep = "sweep.cli:main"
+sweep-gtk = "sweep_gtk.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.18.0",
+    "pytest>=9.0.2",
+]
