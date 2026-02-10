@@ -27,6 +27,15 @@ if TYPE_CHECKING:
     from sweep_gtk.window import SweepWindow
 
 
+def _format_subtitle(total_bytes: int, total_items: int, noun: str, entry_count: int) -> str:
+    """Build the standard 'size · N items · M entries' subtitle."""
+    return (
+        f"{bytes_to_human(total_bytes)}  \u00b7  "
+        f"{total_items:,} {noun}{'s' if total_items != 1 else ''}  \u00b7  "
+        f"{entry_count} entr{'ies' if entry_count != 1 else 'y'}"
+    )
+
+
 class _SelectionState:
     """Tracks checkbox state for scan result selection.
 
@@ -410,62 +419,8 @@ class ScanResultsView(Gtk.Box):
         # Maps cat_id -> list of (sort_key, widget) pairs
         self._category_children: dict[str, list[tuple[tuple, Gtk.Widget]]] = {}
 
-        # Progress indicator (shared by scan & clean)
-        # Adw.Banner provides the styled background; spinner + progress bar sit below it.
-        # Everything is wrapped in one Revealer so it animates as a single unit.
-        self._progress_revealer = Gtk.Revealer(
-            transition_type=Gtk.RevealerTransitionType.SLIDE_DOWN,
-            reveal_child=False,
-        )
-        progress_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-
-        self._progress_banner = Adw.Banner(revealed=True)
-        progress_box.append(self._progress_banner)
-
-        self._progress_bar_row = Gtk.Box(
-            spacing=8,
-            margin_start=12,
-            margin_end=12,
-            margin_top=6,
-            margin_bottom=6,
-        )
-        self._progress_spinner = Gtk.Spinner()
-        self._progress_bar_row.append(self._progress_spinner)
-        self._progress_bar = Gtk.ProgressBar(hexpand=True, valign=Gtk.Align.CENTER)
-        self._progress_bar_row.append(self._progress_bar)
-        progress_box.append(self._progress_bar_row)
-
-        self._progress_revealer.set_child(progress_box)
-        self.append(self._progress_revealer)
-
-        # Floating toolbar with selection and sort controls (appended after scrolled)
-        self._toolbar_revealer = Gtk.Revealer(
-            transition_type=Gtk.RevealerTransitionType.SLIDE_UP,
-            reveal_child=False,
-        )
-        toolbar = Gtk.Box(spacing=6, margin_start=12, margin_end=12)
-
-        select_all_btn = Gtk.Button(child=_icon_label("edit-select-all-symbolic", "Select All"))
-        select_all_btn.connect("clicked", lambda _: self._selection.set_all(True))
-        toolbar.append(select_all_btn)
-
-        select_none_btn = Gtk.Button(child=_icon_label("edit-clear-symbolic", "Select None"))
-        select_none_btn.connect("clicked", lambda _: self._selection.set_all(False))
-        toolbar.append(select_none_btn)
-
-        spacer = Gtk.Box(hexpand=True)
-        toolbar.append(spacer)
-
-        self.sort_btn = Gtk.ToggleButton(
-            child=_icon_label("view-sort-descending-symbolic", "Sort by Size"),
-            active=self._sort_by_size,
-        )
-        self.sort_btn.set_tooltip_text("Sort entries by size (largest first)")
-        self.sort_btn.connect("toggled", self._on_sort_toggled)
-        toolbar.append(self.sort_btn)
-
-        toolbar_clamp = Adw.Clamp(maximum_size=600, child=toolbar, margin_top=6, margin_bottom=6)
-        self._toolbar_revealer.set_child(toolbar_clamp)
+        self._build_progress_ui()
+        self._build_toolbar()
 
         # Scrolled content
         scrolled = Gtk.ScrolledWindow(vexpand=True)
@@ -550,6 +505,75 @@ class ScanResultsView(Gtk.Box):
         group = Adw.PreferencesGroup()
         group.add(widget)
         return group
+
+    def _add_clean_status_widgets(self, row: Adw.ActionRow | Adw.ExpanderRow, plugin_id: str) -> None:
+        """Add hidden spinner + checkmark + label for per-plugin clean progress."""
+        spinner = Gtk.Spinner(visible=False, valign=Gtk.Align.CENTER)
+        check_img = Gtk.Image(visible=False, valign=Gtk.Align.CENTER)
+        label = Gtk.Label(visible=False, valign=Gtk.Align.CENTER)
+        label.add_css_class("caption")
+        label.add_css_class("dim-label")
+        row.add_suffix(spinner)
+        row.add_suffix(check_img)
+        row.add_suffix(label)
+        self._clean.register_plugin(plugin_id, spinner, check_img, label)
+
+    def _build_progress_ui(self) -> None:
+        """Build the progress indicator shared by scan and clean workflows."""
+        self._progress_revealer = Gtk.Revealer(
+            transition_type=Gtk.RevealerTransitionType.SLIDE_DOWN,
+            reveal_child=False,
+        )
+        progress_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+
+        self._progress_banner = Adw.Banner(revealed=True)
+        progress_box.append(self._progress_banner)
+
+        self._progress_bar_row = Gtk.Box(
+            spacing=8,
+            margin_start=12,
+            margin_end=12,
+            margin_top=6,
+            margin_bottom=6,
+        )
+        self._progress_spinner = Gtk.Spinner()
+        self._progress_bar_row.append(self._progress_spinner)
+        self._progress_bar = Gtk.ProgressBar(hexpand=True, valign=Gtk.Align.CENTER)
+        self._progress_bar_row.append(self._progress_bar)
+        progress_box.append(self._progress_bar_row)
+
+        self._progress_revealer.set_child(progress_box)
+        self.append(self._progress_revealer)
+
+    def _build_toolbar(self) -> None:
+        """Build the floating toolbar with selection and sort controls."""
+        self._toolbar_revealer = Gtk.Revealer(
+            transition_type=Gtk.RevealerTransitionType.SLIDE_UP,
+            reveal_child=False,
+        )
+        toolbar = Gtk.Box(spacing=6, margin_start=12, margin_end=12)
+
+        select_all_btn = Gtk.Button(child=_icon_label("edit-select-all-symbolic", "Select All"))
+        select_all_btn.connect("clicked", lambda _: self._selection.set_all(True))
+        toolbar.append(select_all_btn)
+
+        select_none_btn = Gtk.Button(child=_icon_label("edit-clear-symbolic", "Select None"))
+        select_none_btn.connect("clicked", lambda _: self._selection.set_all(False))
+        toolbar.append(select_none_btn)
+
+        spacer = Gtk.Box(hexpand=True)
+        toolbar.append(spacer)
+
+        self.sort_btn = Gtk.ToggleButton(
+            child=_icon_label("view-sort-descending-symbolic", "Sort by Size"),
+            active=self._sort_by_size,
+        )
+        self.sort_btn.set_tooltip_text("Sort entries by size (largest first)")
+        self.sort_btn.connect("toggled", self._on_sort_toggled)
+        toolbar.append(self.sort_btn)
+
+        toolbar_clamp = Adw.Clamp(maximum_size=600, child=toolbar, margin_top=6, margin_bottom=6)
+        self._toolbar_revealer.set_child(toolbar_clamp)
 
     def _on_sort_toggled(self, button: Gtk.ToggleButton) -> None:
         """Re-populate the view when sort toggle changes."""
@@ -670,11 +694,7 @@ class ScanResultsView(Gtk.Box):
 
         module_row = Adw.ExpanderRow()
         module_row.set_title(result["plugin_name"])
-        module_row.set_subtitle(
-            f"{bytes_to_human(result['total_bytes'])}  \u00b7  "
-            f"{total_files:,} {noun}{'s' if total_files != 1 else ''}  \u00b7  "
-            f"{result['file_count']} entr{'ies' if result['file_count'] != 1 else 'y'}"
-        )
+        module_row.set_subtitle(_format_subtitle(result["total_bytes"], total_files, noun, result["file_count"]))
         plugin_id = result["plugin_id"]
         if plugin_id in self._saved_expanded:
             module_row.set_expanded(self._saved_expanded[plugin_id])
@@ -695,16 +715,7 @@ class ScanResultsView(Gtk.Box):
             info_icon.set_valign(Gtk.Align.CENTER)
             module_row.add_suffix(info_icon)
 
-        # Clean status widgets (hidden until cleaning starts)
-        clean_spinner = Gtk.Spinner(visible=False, valign=Gtk.Align.CENTER)
-        clean_check = Gtk.Image(visible=False, valign=Gtk.Align.CENTER)
-        clean_label = Gtk.Label(visible=False, valign=Gtk.Align.CENTER)
-        clean_label.add_css_class("caption")
-        clean_label.add_css_class("dim-label")
-        module_row.add_suffix(clean_spinner)
-        module_row.add_suffix(clean_check)
-        module_row.add_suffix(clean_label)
-        self._clean.register_plugin(result["plugin_id"], clean_spinner, clean_check, clean_label)
+        self._add_clean_status_widgets(module_row, result["plugin_id"])
 
         # Entry rows inside the expander
         entries = result["entries"]
@@ -801,11 +812,7 @@ class ScanResultsView(Gtk.Box):
 
         row = Adw.ActionRow()
         row.set_title(result["plugin_name"])
-        row.set_subtitle(
-            f"{bytes_to_human(result['total_bytes'])}  \u00b7  "
-            f"{total_files:,} {noun}{'s' if total_files != 1 else ''}  \u00b7  "
-            f"{result['file_count']} entr{'ies' if result['file_count'] != 1 else 'y'}"
-        )
+        row.set_subtitle(_format_subtitle(result["total_bytes"], total_files, noun, result["file_count"]))
         row.add_prefix(Gtk.Image.new_from_icon_name(result.get("icon", "application-x-executable-symbolic")))
 
         # Info icon with filesystem path tooltip
@@ -817,16 +824,7 @@ class ScanResultsView(Gtk.Box):
             info_icon.set_valign(Gtk.Align.CENTER)
             row.add_suffix(info_icon)
 
-        # Clean status widgets (hidden until cleaning starts)
-        clean_spinner = Gtk.Spinner(visible=False, valign=Gtk.Align.CENTER)
-        clean_check_img = Gtk.Image(visible=False, valign=Gtk.Align.CENTER)
-        clean_label = Gtk.Label(visible=False, valign=Gtk.Align.CENTER)
-        clean_label.add_css_class("caption")
-        clean_label.add_css_class("dim-label")
-        row.add_suffix(clean_spinner)
-        row.add_suffix(clean_check_img)
-        row.add_suffix(clean_label)
-        self._clean.register_plugin(result["plugin_id"], clean_spinner, clean_check_img, clean_label)
+        self._add_clean_status_widgets(row, result["plugin_id"])
 
         # Size label
         size_label = Gtk.Label(label=bytes_to_human(result["total_bytes"]))
@@ -912,11 +910,7 @@ class ScanResultsView(Gtk.Box):
         group_id = group_meta["id"]
         group_row = Adw.ExpanderRow()
         group_row.set_title(group_meta["name"])
-        group_row.set_subtitle(
-            f"{bytes_to_human(group_total_bytes)}  \u00b7  "
-            f"{group_total_files:,} file{'s' if group_total_files != 1 else ''}  \u00b7  "
-            f"{group_entry_count} entr{'ies' if group_entry_count != 1 else 'y'}"
-        )
+        group_row.set_subtitle(_format_subtitle(group_total_bytes, group_total_files, "file", group_entry_count))
         if group_id in self._saved_expanded:
             group_row.set_expanded(self._saved_expanded[group_id])
         self._expander_rows[group_id] = group_row
@@ -1074,40 +1068,19 @@ class ScanResultsView(Gtk.Box):
         # Only non-empty members produce UI rows
         actionable = [r for r in pending if r["total_bytes"] > 0]
 
-        # Remove old group expander row if it exists (we'll rebuild)
-        old_entry = self._group_widgets.pop(group_id, None)
-        if old_entry:
-            old_cat_group, old_expander = old_entry
-            old_cat_group.remove(old_expander)
-            # Remove from category children tracking
-            if cat_id in self._category_children:
-                self._category_children[cat_id] = [
-                    (sk, w) for sk, w in self._category_children[cat_id] if w is not old_expander
-                ]
-            # Clean up checks for previously rendered (non-empty) members
-            previously_rendered = {r["plugin_id"] for r in actionable}
-            if result["total_bytes"] > 0:
-                previously_rendered.discard(result["plugin_id"])
-            self._selection.remove_plugin_ids(previously_rendered)
-            self._clean.remove_plugin_ids(previously_rendered)
+        self._teardown_streaming_group(group_id, cat_id, actionable, result)
 
         if not actionable:
-            # All received members are empty — no group widget to display
             return
 
         cat_group = self._get_or_create_category_group(cat_id)
         remaining = expected - len(pending)
-
-        # Sort actionable members for display order
         actionable.sort(key=lambda r: (r.get("sort_order", 50), r["plugin_name"].lower()))
 
         if remaining <= 0:
-            # All members received — build final group with non-empty members
             self._populate_group_result(actionable, cat_group)
-            # Track the expander row (last one added to _expander_rows for this group)
             self._group_widgets[group_id] = (cat_group, self._expander_rows[group["id"]])
         else:
-            # Partial group — show non-empty members + loading indicator
             self._build_partial_group(actionable, group, remaining, cat_group)
 
         # Track for sorted insertion within category
@@ -1116,6 +1089,34 @@ class ScanResultsView(Gtk.Box):
         group_widget = self._group_widgets[group_id][1]
         self._category_children.setdefault(cat_id, []).append((group_sort_key, group_widget))
         self._sort_category_items(cat_id)
+
+    def _teardown_streaming_group(
+        self,
+        group_id: str,
+        cat_id: str,
+        actionable: list[dict],
+        new_result: dict,
+    ) -> None:
+        """Remove old group widget and clean up stale selection/clean state."""
+        old_entry = self._group_widgets.pop(group_id, None)
+        if not old_entry:
+            return
+
+        old_cat_group, old_expander = old_entry
+        old_cat_group.remove(old_expander)
+
+        # Remove from category children tracking
+        if cat_id in self._category_children:
+            self._category_children[cat_id] = [
+                (sk, w) for sk, w in self._category_children[cat_id] if w is not old_expander
+            ]
+
+        # Clean up checks for previously rendered (non-empty) members
+        previously_rendered = {r["plugin_id"] for r in actionable}
+        if new_result["total_bytes"] > 0:
+            previously_rendered.discard(new_result["plugin_id"])
+        self._selection.remove_plugin_ids(previously_rendered)
+        self._clean.remove_plugin_ids(previously_rendered)
 
     def _build_partial_group(
         self,
@@ -1141,11 +1142,7 @@ class ScanResultsView(Gtk.Box):
 
         group_row = Adw.ExpanderRow()
         group_row.set_title(group_meta["name"])
-        group_row.set_subtitle(
-            f"{bytes_to_human(group_total_bytes)}  \u00b7  "
-            f"{group_total_files:,} file{'s' if group_total_files != 1 else ''}  \u00b7  "
-            f"{group_entry_count} entr{'ies' if group_entry_count != 1 else 'y'}"
-        )
+        group_row.set_subtitle(_format_subtitle(group_total_bytes, group_total_files, "file", group_entry_count))
 
         group_check = Gtk.CheckButton(active=True, valign=Gtk.Align.CENTER)
         group_row.add_prefix(group_check)
