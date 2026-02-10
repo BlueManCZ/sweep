@@ -7,8 +7,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries, xdg_cache_home
+from sweep.utils import dir_info, xdg_cache_home
 
 log = logging.getLogger(__name__)
 
@@ -16,32 +15,16 @@ log = logging.getLogger(__name__)
 class ThumbnailsPlugin(CleanPlugin):
     """Cleans the freedesktop thumbnail cache (~/.cache/thumbnails)."""
 
-    @property
-    def id(self) -> str:
-        return "thumbnails"
-
-    @property
-    def name(self) -> str:
-        return "Thumbnails"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes cached thumbnail images. File managers and image viewers "
-            "will regenerate thumbnails when browsing directories."
-        )
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 20
-
-    @property
-    def icon(self) -> str:
-        return "image-x-generic-symbolic"
+    id = "thumbnails"
+    name = "Thumbnails"
+    _count_files = True
+    description = (
+        "Removes cached thumbnail images. File managers and image viewers "
+        "will regenerate thumbnails when browsing directories."
+    )
+    category = "user"
+    sort_order = 20
+    icon = "image-x-generic-symbolic"
 
     def _thumb_dir(self) -> Path:
         return xdg_cache_home() / "thumbnails"
@@ -84,7 +67,3 @@ class ThumbnailsPlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} thumbnail directories totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

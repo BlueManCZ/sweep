@@ -8,8 +8,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries, xdg_cache_home
+from sweep.utils import dir_info, xdg_cache_home
 
 log = logging.getLogger(__name__)
 
@@ -104,36 +103,17 @@ def _is_excluded(name: str) -> bool:
 class UserCachePlugin(CleanPlugin):
     """Cleans user cache directory (~/.cache) excluding active app caches."""
 
-    @property
-    def id(self) -> str:
-        return "user_cache"
-
-    @property
-    def name(self) -> str:
-        return "User Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes cached files from ~/.cache. Excludes critical caches like "
-            "font and shader caches. Applications will regenerate these files as needed."
-        )
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 40
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def icon(self) -> str:
-        return "user-home-symbolic"
+    id = "user_cache"
+    name = "User Cache"
+    _count_files = True
+    description = (
+        "Removes cached files from ~/.cache. Excludes critical caches like "
+        "font and shader caches. Applications will regenerate these files as needed."
+    )
+    category = "user"
+    sort_order = 40
+    risk_level = "moderate"
+    icon = "user-home-symbolic"
 
     def _cache_dir(self) -> Path:
         return xdg_cache_home()
@@ -195,7 +175,3 @@ class UserCachePlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} cache directories totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

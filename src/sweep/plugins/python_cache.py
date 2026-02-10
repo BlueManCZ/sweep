@@ -22,281 +22,96 @@ _PYTHON_DIR_RE = re.compile(r"^python(\d+\.\d+)$")
 class PipCachePlugin(SimpleCacheDirPlugin):
     """Cleans pip package cache."""
 
-    @property
-    def id(self) -> str:
-        return "pip_cache"
-
-    @property
-    def name(self) -> str:
-        return "pip"
-
-    @property
-    def description(self) -> str:
-        return "pip package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "pip"
-
-    @property
-    def _label(self) -> str:
-        return "pip"
+    id = "pip_cache"
+    name = "pip"
+    description = "pip package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "pip"
 
 
 class PipenvCachePlugin(SimpleCacheDirPlugin):
     """Cleans pipenv package cache."""
 
-    @property
-    def id(self) -> str:
-        return "pipenv_cache"
-
-    @property
-    def name(self) -> str:
-        return "pipenv"
-
-    @property
-    def description(self) -> str:
-        return "pipenv package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "pipenv"
-
-    @property
-    def _label(self) -> str:
-        return "pipenv"
+    id = "pipenv_cache"
+    name = "pipenv"
+    description = "pipenv package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "pipenv"
 
 
 class UvCachePlugin(SimpleCacheDirPlugin):
     """Cleans uv package cache."""
 
-    @property
-    def id(self) -> str:
-        return "uv_cache"
-
-    @property
-    def name(self) -> str:
-        return "uv"
-
-    @property
-    def description(self) -> str:
-        return "uv package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "uv"
-
-    @property
-    def _label(self) -> str:
-        return "uv"
+    id = "uv_cache"
+    name = "uv"
+    description = "uv package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "uv"
 
 
 class PoetryCachePlugin(SimpleCacheDirPlugin):
     """Cleans Poetry package cache."""
 
-    @property
-    def id(self) -> str:
-        return "poetry_cache"
-
-    @property
-    def name(self) -> str:
-        return "Poetry"
-
-    @property
-    def description(self) -> str:
-        return "Poetry package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "pypoetry"
-
-    @property
-    def _label(self) -> str:
-        return "Poetry"
+    id = "poetry_cache"
+    name = "Poetry"
+    description = "Poetry package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "pypoetry"
 
 
 class VirtualenvCachePlugin(SimpleCacheDirPlugin):
     """Cleans virtualenv package cache."""
 
-    @property
-    def id(self) -> str:
-        return "virtualenv_cache"
-
-    @property
-    def name(self) -> str:
-        return "virtualenv"
-
-    @property
-    def description(self) -> str:
-        return "virtualenv package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "virtualenv"
-
-    @property
-    def _label(self) -> str:
-        return "virtualenv"
+    id = "virtualenv_cache"
+    name = "virtualenv"
+    description = "virtualenv package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "virtualenv"
 
 
 class BlackCachePlugin(SimpleCacheDirPlugin):
     """Cleans Black formatter cache."""
 
-    @property
-    def id(self) -> str:
-        return "black_cache"
-
-    @property
-    def name(self) -> str:
-        return "Black"
-
-    @property
-    def description(self) -> str:
-        return "Black formatter cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "black"
-
-    @property
-    def _label(self) -> str:
-        return "Black"
+    id = "black_cache"
+    name = "Black"
+    description = "Black formatter cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "black"
 
 
 class PylintCachePlugin(SimpleCacheDirPlugin):
     """Cleans Pylint cache."""
 
-    @property
-    def id(self) -> str:
-        return "pylint_cache"
-
-    @property
-    def name(self) -> str:
-        return "Pylint"
-
-    @property
-    def description(self) -> str:
-        return "Pylint cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "pylint"
-
-    @property
-    def _label(self) -> str:
-        return "Pylint"
+    id = "pylint_cache"
+    name = "Pylint"
+    description = "Pylint cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "pylint"
 
 
 class VpythonCachePlugin(MultiDirPlugin):
     """Cleans Chromium depot_tools vpython virtual environment cache."""
 
-    @property
-    def id(self) -> str:
-        return "vpython_cache"
-
-    @property
-    def name(self) -> str:
-        return "vpython"
-
-    @property
-    def description(self) -> str:
-        return "Chromium depot_tools vpython virtual environment cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "vpython_cache"
+    name = "vpython"
+    description = "Chromium depot_tools vpython virtual environment cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
@@ -307,29 +122,12 @@ class VpythonCachePlugin(MultiDirPlugin):
 class PythonStalePkgsPlugin(CleanPlugin):
     """Cleans packages installed for Python versions no longer present."""
 
-    @property
-    def id(self) -> str:
-        return "python_stale_packages"
-
-    @property
-    def name(self) -> str:
-        return "Stale packages"
-
-    @property
-    def description(self) -> str:
-        return "Packages installed for Python versions no longer present"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "python_stale_packages"
+    name = "Stale packages"
+    description = "Packages installed for Python versions no longer present"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     def _local_lib(self) -> Path:
         return Path.home() / ".local" / "lib"

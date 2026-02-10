@@ -5,10 +5,8 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from sweep.models.clean_result import CleanResult
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.utils import remove_entries
 
 log = logging.getLogger(__name__)
 
@@ -25,40 +23,17 @@ _ROTATED_PATTERNS = (
 class RotatedLogsPlugin(CleanPlugin):
     """Cleans rotated syslog files (*.0, *.N.gz) in /var/log."""
 
-    @property
-    def id(self) -> str:
-        return "rotated_logs"
-
-    @property
-    def name(self) -> str:
-        return "Rotated System Logs"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes rotated log files (auth.log.1.gz, syslog.2.gz, etc.) "
-            "in /var/log. The current log files are kept intact."
-        )
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "text-x-generic-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "safe"
-
-    @property
-    def item_noun(self) -> str:
-        return "log"
+    id = "rotated_logs"
+    name = "Rotated System Logs"
+    description = (
+        "Removes rotated log files (auth.log.1.gz, syslog.2.gz, etc.) "
+        "in /var/log. The current log files are kept intact."
+    )
+    category = "system"
+    icon = "text-x-generic-symbolic"
+    requires_root = True
+    risk_level = "safe"
+    item_noun = "log"
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -103,13 +78,4 @@ class RotatedLogsPlugin(CleanPlugin):
             entries=entries,
             total_bytes=total,
             summary=f"Found {len(entries)} rotated log files totaling {total} bytes",
-        )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(
-            plugin_id=self.id,
-            freed_bytes=freed,
-            files_removed=removed,
-            errors=errors,
         )

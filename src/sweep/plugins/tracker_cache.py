@@ -7,8 +7,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries, xdg_cache_home
+from sweep.utils import dir_info, xdg_cache_home
 
 log = logging.getLogger(__name__)
 
@@ -19,32 +18,16 @@ _TRACKER_DIRS = ("tracker", "tracker3")
 class TrackerCachePlugin(CleanPlugin):
     """Cleans the GNOME Tracker file indexing cache."""
 
-    @property
-    def id(self) -> str:
-        return "tracker_cache"
-
-    @property
-    def name(self) -> str:
-        return "Tracker Search Index"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes the Tracker file indexing database used for desktop search. "
-            "Tracker will rebuild the index automatically in the background."
-        )
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 21
-
-    @property
-    def icon(self) -> str:
-        return "system-search-symbolic"
+    id = "tracker_cache"
+    name = "Tracker Search Index"
+    _count_files = True
+    description = (
+        "Removes the Tracker file indexing database used for desktop search. "
+        "Tracker will rebuild the index automatically in the background."
+    )
+    category = "user"
+    sort_order = 21
+    icon = "system-search-symbolic"
 
     def _tracker_dirs(self) -> list[Path]:
         cache = xdg_cache_home()
@@ -93,7 +76,3 @@ class TrackerCachePlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} Tracker cache entries totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

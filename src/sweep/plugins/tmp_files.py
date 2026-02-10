@@ -9,8 +9,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries
+from sweep.utils import dir_info
 
 log = logging.getLogger(__name__)
 
@@ -20,32 +19,16 @@ _ONE_DAY = 86400  # seconds
 class TmpFilesPlugin(CleanPlugin):
     """Cleans user-owned files in /tmp that are older than 1 day."""
 
-    @property
-    def id(self) -> str:
-        return "tmp_files"
-
-    @property
-    def name(self) -> str:
-        return "Temporary Files"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes user-owned temporary files in /tmp older than 1 day. "
-            "Active applications may still be using recent temp files."
-        )
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 30
-
-    @property
-    def icon(self) -> str:
-        return "edit-clear-symbolic"
+    id = "tmp_files"
+    name = "Temporary Files"
+    _count_files = True
+    description = (
+        "Removes user-owned temporary files in /tmp older than 1 day. "
+        "Active applications may still be using recent temp files."
+    )
+    category = "user"
+    sort_order = 30
+    icon = "edit-clear-symbolic"
 
     def has_items(self) -> bool:
         uid = os.getuid()
@@ -95,7 +78,3 @@ class TmpFilesPlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} old temp files totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

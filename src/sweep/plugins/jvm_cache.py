@@ -12,29 +12,12 @@ _GROUP = PluginGroup("jvm", "JVM Dependencies", "Cached JVM build tool dependenc
 class MavenCachePlugin(MultiDirPlugin):
     """Cleans Maven local repository."""
 
-    @property
-    def id(self) -> str:
-        return "maven_cache"
-
-    @property
-    def name(self) -> str:
-        return "Maven"
-
-    @property
-    def description(self) -> str:
-        return "Maven local repository"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "maven_cache"
+    name = "Maven"
+    description = "Maven local repository"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
@@ -44,29 +27,12 @@ class MavenCachePlugin(MultiDirPlugin):
 class GradleCachePlugin(MultiDirPlugin):
     """Cleans Gradle dependency and build cache."""
 
-    @property
-    def id(self) -> str:
-        return "gradle_cache"
-
-    @property
-    def name(self) -> str:
-        return "Gradle Cache"
-
-    @property
-    def description(self) -> str:
-        return "Gradle dependency and build cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "gradle_cache"
+    name = "Gradle Cache"
+    description = "Gradle dependency and build cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
@@ -76,29 +42,12 @@ class GradleCachePlugin(MultiDirPlugin):
 class GradleWrapperCachePlugin(MultiDirPlugin):
     """Cleans downloaded Gradle distributions."""
 
-    @property
-    def id(self) -> str:
-        return "gradle_wrapper_cache"
-
-    @property
-    def name(self) -> str:
-        return "Gradle Wrapper"
-
-    @property
-    def description(self) -> str:
-        return "Downloaded Gradle distributions"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "gradle_wrapper_cache"
+    name = "Gradle Wrapper"
+    description = "Downloaded Gradle distributions"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:

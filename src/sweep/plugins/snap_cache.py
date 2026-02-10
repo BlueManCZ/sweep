@@ -17,36 +17,16 @@ log = logging.getLogger(__name__)
 class SnapCachePlugin(CleanPlugin):
     """Removes old snap revisions, keeping only the current one."""
 
-    @property
-    def id(self) -> str:
-        return "snap_cache"
-
-    @property
-    def name(self) -> str:
-        return "Old Snap Revisions"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes old snap package revisions. Snap keeps previous revisions "
-            "for rollback; this removes all but the currently active revision."
-        )
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "application-x-addon-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def item_noun(self) -> str:
-        return "snap"
+    id = "snap_cache"
+    name = "Old Snap Revisions"
+    description = (
+        "Removes old snap package revisions. Snap keeps previous revisions "
+        "for rollback; this removes all but the currently active revision."
+    )
+    category = "package_manager"
+    icon = "application-x-addon-symbolic"
+    requires_root = True
+    item_noun = "snap"
 
     @property
     def unavailable_reason(self) -> str | None:

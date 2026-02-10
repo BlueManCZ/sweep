@@ -19,7 +19,7 @@ from pathlib import Path
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
 from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_size, has_command, remove_entries
+from sweep.utils import command_clean, has_command, remove_entries
 
 log = logging.getLogger(__name__)
 
@@ -65,35 +65,15 @@ def _find_removable_packages() -> list[Path]:
 class PacmanCachePlugin(CleanPlugin):
     """Cleans old pacman package cache, keeping the 3 most recent versions."""
 
-    @property
-    def id(self) -> str:
-        return "pacman_cache"
-
-    @property
-    def name(self) -> str:
-        return "Pacman Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes old package versions from the pacman cache, keeping the " "3 most recent versions of each package."
-        )
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
+    id = "pacman_cache"
+    name = "Pacman Cache"
+    description = (
+        "Removes old package versions from the pacman cache, keeping the " "3 most recent versions of each package."
+    )
+    category = "package_manager"
+    icon = "system-software-install-symbolic"
+    requires_root = True
+    risk_level = "moderate"
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -185,27 +165,7 @@ class PacmanCachePlugin(CleanPlugin):
 
     def _clean_paccache(self, entries: list[FileEntry]) -> CleanResult:
         """Clean using paccache."""
-        errors: list[str] = []
-        size_before = dir_size(_PACMAN_CACHE_DIR)
-
-        try:
-            subprocess.run(
-                ["paccache", "-rk3"],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except subprocess.CalledProcessError as e:
-            errors.append(f"paccache failed: {e.stderr.strip()}")
-
-        size_after = dir_size(_PACMAN_CACHE_DIR)
-        freed = max(0, size_before - size_after)
-        return CleanResult(
-            plugin_id=self.id,
-            freed_bytes=freed,
-            errors=errors,
-            files_removed=len(entries) if freed > 0 else 0,
-        )
+        return command_clean(self.id, ["paccache", "-rk3"], _PACMAN_CACHE_DIR, entries)
 
     def _clean_native(self, entries: list[FileEntry]) -> CleanResult:
         """Clean by removing the specific files identified during scan."""

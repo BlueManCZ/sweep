@@ -6,10 +6,8 @@ import logging
 import time
 from pathlib import Path
 
-from sweep.models.clean_result import CleanResult
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.utils import remove_entries
 
 log = logging.getLogger(__name__)
 
@@ -35,37 +33,14 @@ _SKIP_NAMES = frozenset(
 class OldAppLogsPlugin(CleanPlugin):
     """Cleans stale standalone log files in /var/log older than 90 days."""
 
-    @property
-    def id(self) -> str:
-        return "old_app_logs"
-
-    @property
-    def name(self) -> str:
-        return "Old Application Logs"
-
-    @property
-    def description(self) -> str:
-        return "Removes log files in /var/log not modified in over 90 days."
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "text-x-generic-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def item_noun(self) -> str:
-        return "log"
+    id = "old_app_logs"
+    name = "Old Application Logs"
+    description = "Removes log files in /var/log not modified in over 90 days."
+    category = "system"
+    icon = "text-x-generic-symbolic"
+    requires_root = True
+    risk_level = "moderate"
+    item_noun = "log"
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -132,13 +107,4 @@ class OldAppLogsPlugin(CleanPlugin):
             entries=entries,
             total_bytes=total,
             summary=f"Found {len(entries)} stale log files totaling {total} bytes",
-        )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(
-            plugin_id=self.id,
-            freed_bytes=freed,
-            files_removed=removed,
-            errors=errors,
         )

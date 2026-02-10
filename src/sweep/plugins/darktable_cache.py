@@ -12,26 +12,12 @@ class DarktableCachePlugin(SimpleCacheDirPlugin):
     here. These files are regenerated automatically when needed.
     """
 
-    @property
-    def id(self) -> str:
-        return "darktable_cache"
-
-    @property
-    def name(self) -> str:
-        return "Darktable Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes cached thumbnail mipmaps and generated image data "
-            "from the Darktable photo editor. Darktable will regenerate "
-            "these files as needed."
-        )
-
-    @property
-    def icon(self) -> str:
-        return "camera-photo-symbolic"
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "darktable"
+    id = "darktable_cache"
+    name = "Darktable Cache"
+    description = (
+        "Removes cached thumbnail mipmaps and generated image data "
+        "from the Darktable photo editor. Darktable will regenerate "
+        "these files as needed."
+    )
+    icon = "camera-photo-symbolic"
+    _cache_dir_name = "darktable"

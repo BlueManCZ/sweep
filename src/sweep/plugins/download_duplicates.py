@@ -7,10 +7,8 @@ import logging
 import re
 from pathlib import Path
 
-from sweep.models.clean_result import CleanResult
 from sweep.models.plugin import CleanPlugin, PluginGroup
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.utils import remove_entries
 
 log = logging.getLogger(__name__)
 
@@ -57,41 +55,15 @@ def _sha256(path: Path) -> str:
 class DownloadDuplicatesPlugin(CleanPlugin):
     """Finds files with identical content in Downloads and offers to remove copies."""
 
-    @property
-    def id(self) -> str:
-        return "download_duplicates"
-
-    @property
-    def name(self) -> str:
-        return "Duplicate Files"
-
-    @property
-    def description(self) -> str:
-        return "Files with identical content in Downloads — keeps the oldest copy"
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def group(self) -> PluginGroup:
-        return _GROUP
-
-    @property
-    def icon(self) -> str:
-        return "edit-copy-symbolic"
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def sort_order(self) -> int:
-        return 40
-
-    @property
-    def item_noun(self) -> str:
-        return "file"
+    id = "download_duplicates"
+    name = "Duplicate Files"
+    description = "Files with identical content in Downloads — keeps the oldest copy"
+    category = "user"
+    group = _GROUP
+    icon = "edit-copy-symbolic"
+    risk_level = "moderate"
+    sort_order = 40
+    item_noun = "file"
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -159,13 +131,4 @@ class DownloadDuplicatesPlugin(CleanPlugin):
             entries=entries,
             total_bytes=total,
             summary=f"Found {len(entries)} duplicate files totaling {total} bytes",
-        )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(
-            plugin_id=self.id,
-            freed_bytes=freed,
-            files_removed=removed,
-            errors=errors,
         )

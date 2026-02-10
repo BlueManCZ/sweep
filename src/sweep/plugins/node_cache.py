@@ -12,29 +12,12 @@ _GROUP = PluginGroup("node", "Node.js Cache", "Package manager caches and tool d
 class NpmCachePlugin(MultiDirPlugin):
     """Cleans npm package cache."""
 
-    @property
-    def id(self) -> str:
-        return "npm_cache"
-
-    @property
-    def name(self) -> str:
-        return "npm"
-
-    @property
-    def description(self) -> str:
-        return "npm package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "npm_cache"
+    name = "npm"
+    description = "npm package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
@@ -44,65 +27,30 @@ class NpmCachePlugin(MultiDirPlugin):
 class PnpmCachePlugin(MultiDirPlugin):
     """Cleans pnpm package cache."""
 
-    @property
-    def id(self) -> str:
-        return "pnpm_cache"
-
-    @property
-    def name(self) -> str:
-        return "pnpm"
-
-    @property
-    def description(self) -> str:
-        return "pnpm package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "pnpm_cache"
+    name = "pnpm"
+    description = "pnpm package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
-        home = Path.home()
         return (
-            home / ".local" / "share" / "pnpm" / "store",
-            home / ".cache" / "pnpm",
+            Path.home() / ".local" / "share" / "pnpm" / "store",
+            Path.home() / ".cache" / "pnpm",
         )
 
 
 class YarnCachePlugin(MultiDirPlugin):
     """Cleans Yarn package cache."""
 
-    @property
-    def id(self) -> str:
-        return "yarn_cache"
-
-    @property
-    def name(self) -> str:
-        return "Yarn"
-
-    @property
-    def description(self) -> str:
-        return "Yarn package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "yarn_cache"
+    name = "Yarn"
+    description = "Yarn package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
@@ -112,29 +60,12 @@ class YarnCachePlugin(MultiDirPlugin):
 class BunCachePlugin(MultiDirPlugin):
     """Cleans Bun package cache."""
 
-    @property
-    def id(self) -> str:
-        return "bun_cache"
-
-    @property
-    def name(self) -> str:
-        return "Bun"
-
-    @property
-    def description(self) -> str:
-        return "Bun package cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "bun_cache"
+    name = "Bun"
+    description = "Bun package cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
@@ -144,106 +75,34 @@ class BunCachePlugin(MultiDirPlugin):
 class TypescriptCachePlugin(SimpleCacheDirPlugin):
     """Cleans TypeScript cache."""
 
-    @property
-    def id(self) -> str:
-        return "typescript_cache"
-
-    @property
-    def name(self) -> str:
-        return "TypeScript"
-
-    @property
-    def description(self) -> str:
-        return "TypeScript cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "typescript"
-
-    @property
-    def _label(self) -> str:
-        return "TypeScript"
+    id = "typescript_cache"
+    name = "TypeScript"
+    description = "TypeScript cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "typescript"
 
 
 class BiomeCachePlugin(SimpleCacheDirPlugin):
     """Cleans Biome cache."""
 
-    @property
-    def id(self) -> str:
-        return "biome_cache"
-
-    @property
-    def name(self) -> str:
-        return "Biome"
-
-    @property
-    def description(self) -> str:
-        return "Biome cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "biome"
-
-    @property
-    def _label(self) -> str:
-        return "Biome"
+    id = "biome_cache"
+    name = "Biome"
+    description = "Biome cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "biome"
 
 
 class NodeGypCachePlugin(SimpleCacheDirPlugin):
     """Cleans node-gyp cache."""
 
-    @property
-    def id(self) -> str:
-        return "node_gyp_cache"
-
-    @property
-    def name(self) -> str:
-        return "node-gyp"
-
-    @property
-    def description(self) -> str:
-        return "node-gyp cache"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "node-gyp"
-
-    @property
-    def _label(self) -> str:
-        return "node-gyp"
+    id = "node_gyp_cache"
+    name = "node-gyp"
+    description = "node-gyp cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "node-gyp"

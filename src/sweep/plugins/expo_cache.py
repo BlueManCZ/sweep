@@ -9,71 +9,37 @@ from sweep.models.plugin import MultiDirPlugin, PluginGroup
 _GROUP = PluginGroup("expo", "Expo Cache", "Mobile build artifacts and downloaded SDKs")
 
 
+def _expo_dir() -> Path:
+    return Path.home() / ".expo"
+
+
 class ExpoApkCachePlugin(MultiDirPlugin):
     """Cleans cached Expo Go and Android APK downloads."""
 
-    @property
-    def id(self) -> str:
-        return "expo_apk_cache"
-
-    @property
-    def name(self) -> str:
-        return "Expo APKs"
-
-    @property
-    def description(self) -> str:
-        return "Cached Expo Go and Android APK downloads"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "expo_apk_cache"
+    name = "Expo APKs"
+    description = "Cached Expo Go and Android APK downloads"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
-        expo = Path.home() / ".expo"
-        return (expo / "expo-go", expo / "android-apk-cache")
+        d = _expo_dir()
+        return (d / "expo-go", d / "android-apk-cache")
 
 
 class ExpoMetadataCachePlugin(MultiDirPlugin):
     """Cleans Expo schema, version, and module caches."""
 
-    @property
-    def id(self) -> str:
-        return "expo_metadata_cache"
-
-    @property
-    def name(self) -> str:
-        return "Expo Metadata"
-
-    @property
-    def description(self) -> str:
-        return "Schema, version, and module caches"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "expo_metadata_cache"
+    name = "Expo Metadata"
+    description = "Schema, version, and module caches"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
-        expo = Path.home() / ".expo"
-        return (
-            expo / "schema-cache",
-            expo / "versions-cache",
-            expo / "native-modules-cache",
-        )
+        d = _expo_dir()
+        return (d / "schema-cache", d / "versions-cache", d / "native-modules-cache")

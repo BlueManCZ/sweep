@@ -12,29 +12,12 @@ _GROUP = PluginGroup("rust", "Cargo Registry", "Cargo registry index, crate sour
 class CargoRegistryCachePlugin(MultiDirPlugin):
     """Cleans downloaded crate sources and index."""
 
-    @property
-    def id(self) -> str:
-        return "cargo_registry_cache"
-
-    @property
-    def name(self) -> str:
-        return "Cargo Registry"
-
-    @property
-    def description(self) -> str:
-        return "Downloaded crate sources and index"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "cargo_registry_cache"
+    name = "Cargo Registry"
+    description = "Downloaded crate sources and index"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
@@ -44,29 +27,12 @@ class CargoRegistryCachePlugin(MultiDirPlugin):
 class CargoAdvisoryDbPlugin(MultiDirPlugin):
     """Cleans cargo-audit advisory database."""
 
-    @property
-    def id(self) -> str:
-        return "cargo_advisory_db_cache"
-
-    @property
-    def name(self) -> str:
-        return "Advisory DB"
-
-    @property
-    def description(self) -> str:
-        return "cargo-audit advisory database"
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "cargo_advisory_db_cache"
+    name = "Advisory DB"
+    description = "cargo-audit advisory database"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:

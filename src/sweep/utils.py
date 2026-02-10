@@ -8,6 +8,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from sweep.models.clean_result import CleanResult
 from sweep.models.scan_result import FileEntry
 
 log = logging.getLogger(__name__)
@@ -73,6 +74,37 @@ def remove_entries(
             errors.append(f"{entry.path}: {e}")
 
     return freed, removed, errors
+
+
+def command_clean(
+    plugin_id: str,
+    command: list[str],
+    measure_dir: Path,
+    entries: list[FileEntry],
+) -> CleanResult:
+    """Run a system command to clean files and measure freed space.
+
+    Measures the directory size before and after running the command to
+    determine how much space was freed.  Used by plugins that delegate
+    cleaning to external tools (apt-get, dnf, journalctl, paccache, etc.).
+    """
+    errors: list[str] = []
+    size_before = dir_size(measure_dir)
+
+    try:
+        subprocess.run(command, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        errors.append(f"{command[0]} failed: {e.stderr.strip()}")
+
+    size_after = dir_size(measure_dir)
+    freed = max(0, size_before - size_after)
+
+    return CleanResult(
+        plugin_id=plugin_id,
+        freed_bytes=freed,
+        errors=errors,
+        files_removed=len(entries) if freed > 0 else 0,
+    )
 
 
 def dir_info(path: Path | str) -> tuple[int, int]:

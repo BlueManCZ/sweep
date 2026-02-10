@@ -7,8 +7,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries, xdg_data_home
+from sweep.utils import dir_info, xdg_data_home
 
 log = logging.getLogger(__name__)
 
@@ -16,29 +15,12 @@ log = logging.getLogger(__name__)
 class TrashPlugin(CleanPlugin):
     """Empties the user's trash directory (~/.local/share/Trash)."""
 
-    @property
-    def id(self) -> str:
-        return "trash"
-
-    @property
-    def name(self) -> str:
-        return "Trash"
-
-    @property
-    def description(self) -> str:
-        return "Permanently deletes files in the trash. These files were already deleted by the user."
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 10
-
-    @property
-    def icon(self) -> str:
-        return "user-trash-symbolic"
+    id = "trash"
+    name = "Trash"
+    description = "Permanently deletes files in the trash. These files were already deleted by the user."
+    category = "user"
+    sort_order = 10
+    icon = "user-trash-symbolic"
 
     def _trash_dir(self) -> Path:
         return xdg_data_home() / "Trash"
@@ -84,7 +66,3 @@ class TrashPlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} items in trash totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

@@ -17,33 +17,13 @@ log = logging.getLogger(__name__)
 class FlatpakCachePlugin(CleanPlugin):
     """Removes unused Flatpak runtimes and extensions."""
 
-    @property
-    def id(self) -> str:
-        return "flatpak_cache"
-
-    @property
-    def name(self) -> str:
-        return "Flatpak Unused Runtimes"
-
-    @property
-    def description(self) -> str:
-        return "Removes Flatpak runtimes and extensions that are no longer used by " "any installed application."
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "application-x-addon-symbolic"
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def item_noun(self) -> str:
-        return "runtime"
+    id = "flatpak_cache"
+    name = "Flatpak Unused Runtimes"
+    description = "Removes Flatpak runtimes and extensions that are no longer used by " "any installed application."
+    category = "package_manager"
+    icon = "application-x-addon-symbolic"
+    risk_level = "moderate"
+    item_noun = "runtime"
 
     @property
     def unavailable_reason(self) -> str | None:
