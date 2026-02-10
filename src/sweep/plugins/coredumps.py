@@ -66,12 +66,14 @@ class CoredumpsPlugin(CleanPlugin):
                 try:
                     size = item.stat().st_size
                     if size > 0:
-                        entries.append(FileEntry(
-                            path=item,
-                            size_bytes=size,
-                            description=f"Core dump: {item.name}",
-                            file_count=1,
-                        ))
+                        entries.append(
+                            FileEntry(
+                                path=item,
+                                size_bytes=size,
+                                description=f"Core dump: {item.name}",
+                                file_count=1,
+                            )
+                        )
                         total += size
                 except OSError:
                     log.debug("Cannot access: %s", item)

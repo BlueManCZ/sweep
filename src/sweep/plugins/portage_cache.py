@@ -28,6 +28,7 @@ def _portage_available() -> bool:
         return False
     try:
         import portage  # noqa: F401
+
         return True
     except Exception:
         return False
@@ -37,6 +38,7 @@ def _gentoolkit_available() -> bool:
     """Check if gentoolkit's eclean API is available."""
     try:
         from gentoolkit.eclean.search import DistfilesSearch  # noqa: F401
+
         return True
     except Exception:
         return False
@@ -88,7 +90,13 @@ def _calc_depclean_candidates() -> list[str]:
     os.dup2(devnull, 1)
     try:
         rval, cleanlist, _ordered, _req_pkg_count = calc_depclean(
-            settings, trees, {}, myopts, "depclean", args_set, spinner=None,
+            settings,
+            trees,
+            {},
+            myopts,
+            "depclean",
+            args_set,
+            spinner=None,
         )
     finally:
         os.dup2(old_fd, 1)
@@ -162,23 +170,29 @@ class PortageDistfilesPlugin(CleanPlugin):
         for display_name, files in clean_me.items():
             for filepath in files:
                 size = _file_size(filepath)
-                entries.append(FileEntry(
-                    path=Path(filepath),
-                    size_bytes=size,
-                    description=f"Distfile: {display_name}",
-                    file_count=1,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=Path(filepath),
+                        size_bytes=size,
+                        description=f"Distfile: {display_name}",
+                        is_leaf=True,
+                        file_count=1,
+                    )
+                )
                 total += size
 
         for checkout in vcs:
             checkout_path = Path(checkout)
             size, fcount = dir_info(checkout_path)
-            entries.append(FileEntry(
-                path=checkout_path,
-                size_bytes=size,
-                description=f"VCS checkout: {checkout_path.name}",
-                file_count=fcount,
-            ))
+            entries.append(
+                FileEntry(
+                    path=checkout_path,
+                    size_bytes=size,
+                    description=f"VCS checkout: {checkout_path.name}",
+                    is_leaf=True,
+                    file_count=fcount,
+                )
+            )
             total += size
 
         return ScanResult(
@@ -254,29 +268,37 @@ class PortagePackagesPlugin(CleanPlugin):
         }
 
         dead_binpkgs, invalid_paths = findPackages(
-            options, destructive=True, pkgdir=pkgdir,
+            options,
+            destructive=True,
+            pkgdir=pkgdir,
         )
 
         for cpv, filepaths in dead_binpkgs.items():
             for filepath in filepaths:
                 size = _file_size(filepath)
-                entries.append(FileEntry(
-                    path=Path(filepath),
-                    size_bytes=size,
-                    description=f"Binary package: {cpv}",
-                    file_count=1,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=Path(filepath),
+                        size_bytes=size,
+                        description=f"Binary package: {cpv}",
+                        is_leaf=True,
+                        file_count=1,
+                    )
+                )
                 total += size
 
         for cpv, filepaths in invalid_paths.items():
             for filepath in filepaths:
                 size = _file_size(filepath)
-                entries.append(FileEntry(
-                    path=Path(filepath),
-                    size_bytes=size,
-                    description=f"Invalid package: {cpv}",
-                    file_count=1,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=Path(filepath),
+                        size_bytes=size,
+                        description=f"Invalid package: {cpv}",
+                        is_leaf=True,
+                        file_count=1,
+                    )
+                )
                 total += size
 
         return ScanResult(
@@ -344,12 +366,14 @@ class PortageDepcleanPlugin(CleanPlugin):
         total = 0
         for cpv in cpvs:
             size = _get_installed_size(cpv)
-            entries.append(FileEntry(
-                path=_VDB_PATH / cpv,
-                size_bytes=size,
-                description=cpv,
-                is_leaf=True,
-            ))
+            entries.append(
+                FileEntry(
+                    path=_VDB_PATH / cpv,
+                    size_bytes=size,
+                    description=cpv,
+                    is_leaf=True,
+                )
+            )
             total += size
 
         return ScanResult(
@@ -374,7 +398,9 @@ class PortageDepcleanPlugin(CleanPlugin):
 
         result = subprocess.run(
             ["emerge", "--depclean", "--quiet", "--"] + atoms,
-            capture_output=True, text=True, timeout=600,
+            capture_output=True,
+            text=True,
+            timeout=600,
         )
 
         if result.returncode == 0:

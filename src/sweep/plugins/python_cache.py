@@ -365,12 +365,15 @@ class PythonStalePkgsPlugin(CleanPlugin):
         for python_dir, version in self._find_stale_python_dirs():
             size, fcount = dir_info(python_dir)
             if size > 0:
-                entries.append(FileEntry(
-                    path=python_dir,
-                    size_bytes=size,
-                    description=f"Packages for removed Python {version}",
-                    file_count=fcount,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=python_dir,
+                        size_bytes=size,
+                        description=f"Packages for removed Python {version}",
+                        is_leaf=True,
+                        file_count=fcount,
+                    )
+                )
                 total += size
 
         return ScanResult(
@@ -383,6 +386,8 @@ class PythonStalePkgsPlugin(CleanPlugin):
 
     def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
         freed, removed, errors = remove_entries(
-            entries, count_files=True, recreate_dirs=False,
+            entries,
+            count_files=True,
+            recreate_dirs=False,
         )
         return CleanResult(plugin_id=self.id, freed_bytes=freed, files_removed=removed, errors=errors)

@@ -68,10 +68,7 @@ class RotatedLogsPlugin(CleanPlugin):
 
     def has_items(self) -> bool:
         try:
-            return any(
-                next(_LOG_DIR.glob(pattern), None) is not None
-                for pattern in _ROTATED_PATTERNS
-            )
+            return any(next(_LOG_DIR.glob(pattern), None) is not None for pattern in _ROTATED_PATTERNS)
         except OSError:
             return False
 
@@ -85,12 +82,15 @@ class RotatedLogsPlugin(CleanPlugin):
                     try:
                         if path.is_file():
                             size = path.stat().st_size
-                            entries.append(FileEntry(
-                                path=path,
-                                size_bytes=size,
-                                description=f"Rotated log: {path.name}",
-                                file_count=1,
-                            ))
+                            entries.append(
+                                FileEntry(
+                                    path=path,
+                                    size_bytes=size,
+                                    description=f"Rotated log: {path.name}",
+                                    is_leaf=True,
+                                    file_count=1,
+                                )
+                            )
                             total += size
                     except OSError:
                         log.debug("Cannot access: %s", path)

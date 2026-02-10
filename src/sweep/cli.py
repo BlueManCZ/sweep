@@ -41,6 +41,7 @@ def main(verbose: int) -> None:
 
 # ── list ─────────────────────────────────────────────────────────────────
 
+
 @main.command("list")
 @click.option("--category", "-c", default=None, help="Filter by category")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON")
@@ -105,6 +106,7 @@ def list_cmd(category: str | None, as_json: bool) -> None:
 
 
 # ── scan ─────────────────────────────────────────────────────────────────
+
 
 @main.command()
 @click.argument("plugin_ids", nargs=-1)
@@ -179,6 +181,7 @@ def scan(plugin_ids: tuple[str, ...], category: str | None, as_json: bool) -> No
 
 
 # ── clean ────────────────────────────────────────────────────────────────
+
 
 @main.command()
 @click.argument("plugin_ids", nargs=-1)
@@ -306,6 +309,7 @@ def _interactive_select(results: list) -> set[str]:
 
 # ── clean-as-root (internal, hidden) ──────────────────────────────────────
 
+
 @main.command("clean-as-root", hidden=True)
 def clean_as_root() -> None:
     """Internal command invoked via pkexec to clean as root.
@@ -320,8 +324,11 @@ def clean_as_root() -> None:
         raw = sys.stdin.read()
         payload = json.loads(raw)
     except (json.JSONDecodeError, TypeError) as exc:
-        click.echo(json.dumps([{"plugin_id": "unknown", "freed_bytes": 0, "files_removed": 0,
-                                "errors": [f"Bad input: {exc}"]}]))
+        click.echo(
+            json.dumps(
+                [{"plugin_id": "unknown", "freed_bytes": 0, "files_removed": 0, "errors": [f"Bad input: {exc}"]}]
+            )
+        )
         sys.exit(1)
 
     raw_entries = payload.get("entries_by_plugin", {})
@@ -358,6 +365,7 @@ def clean_as_root() -> None:
 
 # ── stats ────────────────────────────────────────────────────────────────
 
+
 @main.command()
 @click.option("--period", "-p", default="all", type=click.Choice(["today", "week", "month", "all"]))
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON")
@@ -379,11 +387,14 @@ def stats(period: str, as_json: bool) -> None:
     if data["per_plugin"]:
         click.echo(f"\n  Per-plugin breakdown:")
         for pid, pstats in sorted(data["per_plugin"].items(), key=lambda x: x[1]["bytes_freed"], reverse=True):
-            click.echo(f"    {pid:25s} {bytes_to_human(pstats['bytes_freed']):>10s}  ({pstats['files_removed']:,} files)")
+            click.echo(
+                f"    {pid:25s} {bytes_to_human(pstats['bytes_freed']):>10s}  ({pstats['files_removed']:,} files)"
+            )
     click.echo()
 
 
 # ── plugins ──────────────────────────────────────────────────────────────
+
 
 @main.group()
 def plugins() -> None:
@@ -427,6 +438,7 @@ def plugins_info(plugin_id: str) -> None:
 
 
 # ── service ──────────────────────────────────────────────────────────────
+
 
 @main.group()
 def service() -> None:

@@ -56,7 +56,7 @@ class TestPluginLoader:
     def test_loads_builtin_plugins(self):
         registry = PluginRegistry()
         load_plugins(registry)
-        assert len(registry) == 78  # All built-in standalone plugins
+        assert len(registry) == 80  # All built-in standalone plugins
 
     def test_all_plugins_have_unique_ids(self):
         registry = PluginRegistry()

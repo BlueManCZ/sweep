@@ -65,9 +65,7 @@ def _load_plugins_from_directory(directory: Path) -> list[type[CleanPlugin]]:
             continue
 
         try:
-            spec = importlib.util.spec_from_file_location(
-                f"sweep_ext_plugin_{path.stem}", module_file
-            )
+            spec = importlib.util.spec_from_file_location(f"sweep_ext_plugin_{path.stem}", module_file)
             if spec is None or spec.loader is None:
                 continue
             module = importlib.util.module_from_spec(spec)

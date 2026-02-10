@@ -76,8 +76,7 @@ class PacmanCachePlugin(CleanPlugin):
     @property
     def description(self) -> str:
         return (
-            "Removes old package versions from the pacman cache, keeping the "
-            "3 most recent versions of each package."
+            "Removes old package versions from the pacman cache, keeping the " "3 most recent versions of each package."
         )
 
     @property
@@ -142,10 +141,15 @@ class PacmanCachePlugin(CleanPlugin):
                 if path.exists():
                     try:
                         size = path.stat().st_size
-                        entries.append(FileEntry(
-                            path=path, size_bytes=size,
-                            description=f"Package: {path.name}", file_count=1,
-                        ))
+                        entries.append(
+                            FileEntry(
+                                path=path,
+                                size_bytes=size,
+                                description=f"Package: {path.name}",
+                                is_leaf=True,
+                                file_count=1,
+                            )
+                        )
                         total += size
                     except OSError:
                         pass
@@ -160,10 +164,15 @@ class PacmanCachePlugin(CleanPlugin):
         for path in _find_removable_packages():
             try:
                 size = path.stat().st_size
-                entries.append(FileEntry(
-                    path=path, size_bytes=size,
-                    description=f"Package: {path.name}", file_count=1,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=path,
+                        size_bytes=size,
+                        description=f"Package: {path.name}",
+                        is_leaf=True,
+                        file_count=1,
+                    )
+                )
                 total += size
             except OSError:
                 pass
@@ -192,7 +201,9 @@ class PacmanCachePlugin(CleanPlugin):
         size_after = dir_size(_PACMAN_CACHE_DIR)
         freed = max(0, size_before - size_after)
         return CleanResult(
-            plugin_id=self.id, freed_bytes=freed, errors=errors,
+            plugin_id=self.id,
+            freed_bytes=freed,
+            errors=errors,
             files_removed=len(entries) if freed > 0 else 0,
         )
 
@@ -200,6 +211,8 @@ class PacmanCachePlugin(CleanPlugin):
         """Clean by removing the specific files identified during scan."""
         freed, removed, errors = remove_entries(entries)
         return CleanResult(
-            plugin_id=self.id, freed_bytes=freed,
-            errors=errors, files_removed=removed,
+            plugin_id=self.id,
+            freed_bytes=freed,
+            errors=errors,
+            files_removed=removed,
         )

@@ -70,7 +70,9 @@ class ThumbnailsPlugin(CleanPlugin):
                 else:
                     size, fcount = item.stat().st_size, 1
                 if size > 0:
-                    entries.append(FileEntry(path=item, size_bytes=size, description=f"Thumbnails: {item.name}", file_count=fcount))
+                    entries.append(
+                        FileEntry(path=item, size_bytes=size, description=f"Thumbnails: {item.name}", file_count=fcount)
+                    )
                     total += size
             except OSError:
                 log.debug("Cannot access: %s", item)

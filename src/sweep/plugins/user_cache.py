@@ -24,20 +24,51 @@ _EXCLUDE_DIRS = {
 
 # Handled by dedicated plugins
 _PLUGIN_DIRS = {
-    "thumbnails", "mozilla", "chromium", "google-chrome", "opera", "zen",
-    "BraveSoftware", "microsoft-edge", "electron", "darktable", "Google",
+    "thumbnails",
+    "mozilla",
+    "chromium",
+    "google-chrome",
+    "opera",
+    "zen",
+    "BraveSoftware",
+    "microsoft-edge",
+    "electron",
+    "darktable",
+    "Google",
     "JetBrains",
-    "pip", "pipenv", "uv", "pypoetry", "virtualenv", ".vpython-root",
-    "yarn", "pnpm", "typescript", "biome", "black", "node-gyp",
-    "nvidia", "mesa_shader_cache", "mesa_shader_cache_db",
-    "ms-playwright", "Cypress", "electron-builder", "spotify",
-    "github-copilot", "strawberry",
+    "pip",
+    "pipenv",
+    "uv",
+    "pypoetry",
+    "virtualenv",
+    ".vpython-root",
+    "yarn",
+    "pnpm",
+    "typescript",
+    "biome",
+    "black",
+    "node-gyp",
+    "nvidia",
+    "mesa_shader_cache",
+    "mesa_shader_cache_db",
+    "ms-playwright",
+    "Cypress",
+    "electron-builder",
+    "spotify",
+    "github-copilot",
+    "strawberry",
     "unity3d",
     "whatsapp-for-linux",
-    "wine", "winetricks", "protontricks",
-    "thunderbird", "evolution", "geary", "epiphany",
+    "wine",
+    "winetricks",
+    "protontricks",
+    "thunderbird",
+    "evolution",
+    "geary",
+    "epiphany",
     "pylint",
-    "tracker", "tracker3",
+    "tracker",
+    "tracker3",
 }
 
 # Prefixes handled by dedicated plugins (directories with dynamic suffixes)
@@ -67,11 +98,7 @@ def _has_any_file(path: Path | str) -> bool:
 
 def _is_excluded(name: str) -> bool:
     """Check if a cache directory should be skipped."""
-    return (
-        name in _EXCLUDE_DIRS
-        or name in _PLUGIN_DIRS
-        or name.startswith(_PLUGIN_DIR_PREFIXES)
-    )
+    return name in _EXCLUDE_DIRS or name in _PLUGIN_DIRS or name.startswith(_PLUGIN_DIR_PREFIXES)
 
 
 class UserCachePlugin(CleanPlugin):
@@ -148,7 +175,15 @@ class UserCachePlugin(CleanPlugin):
                 else:
                     size, fcount = item.stat().st_size, 1
                 if size > 0:
-                    entries.append(FileEntry(path=item, size_bytes=size, description=f"Cache: {item.name}", file_count=fcount))
+                    entries.append(
+                        FileEntry(
+                            path=item,
+                            size_bytes=size,
+                            description=f"Cache: {item.name}",
+                            is_leaf=True,
+                            file_count=fcount,
+                        )
+                    )
                     total += size
             except OSError:
                 log.debug("Cannot access: %s", item)

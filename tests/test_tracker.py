@@ -92,13 +92,16 @@ class TestTracker:
         tracker.save_session()
         assert not isolate_storage.exists()
 
+
 class TestTrackerStats:
     def test_per_plugin_aggregation(self, isolate_storage):
         t1 = Tracker()
-        t1.record([
-            CleanResult(plugin_id="cache", freed_bytes=100, files_removed=5),
-            CleanResult(plugin_id="trash", freed_bytes=200, files_removed=3),
-        ])
+        t1.record(
+            [
+                CleanResult(plugin_id="cache", freed_bytes=100, files_removed=5),
+                CleanResult(plugin_id="trash", freed_bytes=200, files_removed=3),
+            ]
+        )
         t1.save_session()
 
         t2 = Tracker()

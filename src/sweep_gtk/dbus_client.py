@@ -113,7 +113,8 @@ class SweepClient:
     ) -> list[dict[str, Any]]:
         """Scan for cleanable files."""
         results = self._engine.scan(
-            plugin_ids=plugin_ids, on_progress=callback,
+            plugin_ids=plugin_ids,
+            on_progress=callback,
         )
         return [self._transform_scan_result(r) for r in results]
 
@@ -149,7 +150,8 @@ class SweepClient:
         return transformed
 
     def _build_engine_entries(
-        self, entries_by_plugin: dict[str, list[dict]],
+        self,
+        entries_by_plugin: dict[str, list[dict]],
     ) -> dict[str, list[FileEntry]]:
         """Convert UI entry dicts to engine FileEntry objects."""
         return {
@@ -230,6 +232,7 @@ class SweepClient:
     def get_history(self) -> dict[str, Any]:
         """Get full session history."""
         from sweep.storage import load_history
+
         return load_history()
 
 
@@ -239,5 +242,3 @@ def _safe_has_items(plugin: Any) -> bool:
         return plugin.has_items()
     except Exception:
         return True
-
-

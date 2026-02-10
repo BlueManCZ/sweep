@@ -99,9 +99,7 @@ class CleanPlugin(ABC):
 
         Override this in subclasses. entries is guaranteed non-None.
         """
-        raise NotImplementedError(
-            f"{type(self).__name__} must implement _do_clean()"
-        )
+        raise NotImplementedError(f"{type(self).__name__} must implement _do_clean()")
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -170,12 +168,14 @@ class SimpleCacheDirPlugin(CleanPlugin, ABC):
                     else:
                         size, fcount = item.stat().st_size, 1
                     if size > 0:
-                        entries.append(FileEntry(
-                            path=item,
-                            size_bytes=size,
-                            description=f"{self._label} cache: {item.name}",
-                            file_count=fcount,
-                        ))
+                        entries.append(
+                            FileEntry(
+                                path=item,
+                                size_bytes=size,
+                                description=f"{self._label} cache: {item.name}",
+                                file_count=fcount,
+                            )
+                        )
                         total += size
                 except OSError:
                     log.debug("Cannot access: %s", item)
@@ -227,10 +227,7 @@ class MultiDirPlugin(CleanPlugin, ABC):
 
     def has_items(self) -> bool:
         try:
-            return any(
-                d.is_dir() and any(d.iterdir())
-                for d in self._cache_dirs
-            )
+            return any(d.is_dir() and any(d.iterdir()) for d in self._cache_dirs)
         except OSError:
             return False
 
@@ -244,12 +241,14 @@ class MultiDirPlugin(CleanPlugin, ABC):
             if cache_dir.is_dir():
                 size, fcount = dir_info(cache_dir)
                 if size > 0:
-                    entries.append(FileEntry(
-                        path=cache_dir,
-                        size_bytes=size,
-                        description=self.description,
-                        file_count=fcount,
-                    ))
+                    entries.append(
+                        FileEntry(
+                            path=cache_dir,
+                            size_bytes=size,
+                            description=self.description,
+                            file_count=fcount,
+                        )
+                    )
                     total += size
 
         return ScanResult(
@@ -263,9 +262,7 @@ class MultiDirPlugin(CleanPlugin, ABC):
     def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
         from sweep.utils import remove_entries
 
-        freed, removed, errors = remove_entries(
-            entries, count_files=True, recreate_dirs=self._recreate_dirs
-        )
+        freed, removed, errors = remove_entries(entries, count_files=True, recreate_dirs=self._recreate_dirs)
         return CleanResult(
             plugin_id=self.id,
             freed_bytes=freed,

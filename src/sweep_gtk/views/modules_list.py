@@ -80,8 +80,7 @@ class ModulesView(Gtk.Box):
         show_unavail_btn.connect("toggled", self._on_show_unavailable_toggled)
         toolbar.append(show_unavail_btn)
 
-        toolbar_clamp = Adw.Clamp(maximum_size=600, child=toolbar,
-                                  margin_top=6, margin_bottom=6)
+        toolbar_clamp = Adw.Clamp(maximum_size=600, child=toolbar, margin_top=6, margin_bottom=6)
 
         # Scrolled content
         scrolled = Gtk.ScrolledWindow(vexpand=True)
@@ -264,9 +263,7 @@ class ModulesView(Gtk.Box):
         # Rotate chevron: go-next (▸) when collapsed, go-down (▾) when expanded
         chevron = self._empty_chevrons.get(cat_id)
         if chevron:
-            chevron.set_from_icon_name(
-                "go-down-symbolic" if not collapsed else "go-next-symbolic"
-            )
+            chevron.set_from_icon_name("go-down-symbolic" if not collapsed else "go-next-symbolic")
 
         # Toggle visibility of empty items (standalone rows and all-empty groups)
         for row in self._plugin_rows.values():
@@ -409,8 +406,7 @@ class ModulesView(Gtk.Box):
     def get_selected_plugin_ids(self) -> list[str]:
         """Return IDs of selected plugins."""
         return [
-            pid for pid, row in self._plugin_rows.items()
-            if row.switch.get_active() and row.plugin_info["available"]
+            pid for pid, row in self._plugin_rows.items() if row.switch.get_active() and row.plugin_info["available"]
         ]
 
     def on_scan_clicked(self, button: Gtk.Button | None) -> None:
@@ -451,6 +447,7 @@ class ModulesView(Gtk.Box):
             GLib.idle_add(self._on_scan_complete_streaming)
 
         import threading
+
         threading.Thread(target=do_scan, daemon=True).start()
 
     def _on_scan_complete_streaming(self) -> None:
@@ -482,9 +479,7 @@ class _MemberRow(Adw.ActionRow):
 
         self.set_title(plugin_info["name"])
         self.set_subtitle(plugin_info["description"])
-        self.add_prefix(
-            Gtk.Image.new_from_icon_name(plugin_info.get("icon", "application-x-executable-symbolic"))
-        )
+        self.add_prefix(Gtk.Image.new_from_icon_name(plugin_info.get("icon", "application-x-executable-symbolic")))
 
         # Status badge (before switch so switches stay aligned)
         self._status_label = Gtk.Label()
@@ -632,10 +627,7 @@ class _GroupRow(Adw.ExpanderRow):
 
     def sync_master_from_members(self) -> None:
         """Set master switch based on member states (no signal recursion)."""
-        active_members = [
-            r for r in self.member_rows.values()
-            if r.plugin_info["available"]
-        ]
+        active_members = [r for r in self.member_rows.values() if r.plugin_info["available"]]
         if not active_members:
             return
 
@@ -655,9 +647,7 @@ class _PluginRow(Adw.ExpanderRow):
 
         self.set_title(plugin_info["name"])
         self.set_subtitle(plugin_info["description"])
-        self.add_prefix(
-            Gtk.Image.new_from_icon_name(plugin_info.get("icon", "application-x-executable-symbolic"))
-        )
+        self.add_prefix(Gtk.Image.new_from_icon_name(plugin_info.get("icon", "application-x-executable-symbolic")))
 
         # Enable switch
         self.switch = Gtk.Switch(valign=Gtk.Align.CENTER)

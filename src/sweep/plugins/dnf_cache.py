@@ -29,10 +29,7 @@ class DnfCachePlugin(CleanPlugin):
 
     @property
     def description(self) -> str:
-        return (
-            "Removes cached DNF metadata and packages. "
-            "DNF will re-download metadata when needed."
-        )
+        return "Removes cached DNF metadata and packages. " "DNF will re-download metadata when needed."
 
     @property
     def category(self) -> str:
@@ -64,12 +61,14 @@ class DnfCachePlugin(CleanPlugin):
         size, fcount = dir_info(_DNF_CACHE_DIR)
         entries: list[FileEntry] = []
         if size > 0:
-            entries.append(FileEntry(
-                path=_DNF_CACHE_DIR,
-                size_bytes=size,
-                description="DNF package cache",
-                file_count=fcount,
-            ))
+            entries.append(
+                FileEntry(
+                    path=_DNF_CACHE_DIR,
+                    size_bytes=size,
+                    description="DNF package cache",
+                    file_count=fcount,
+                )
+            )
 
         return ScanResult(
             plugin_id=self.id,
@@ -96,4 +95,6 @@ class DnfCachePlugin(CleanPlugin):
         size_after = dir_size(_DNF_CACHE_DIR)
         freed = max(0, size_before - size_after)
 
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=len(entries) if freed > 0 else 0)
+        return CleanResult(
+            plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=len(entries) if freed > 0 else 0
+        )

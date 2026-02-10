@@ -142,13 +142,15 @@ class DownloadDuplicatesPlugin(CleanPlugin):
                 duplicates.sort(key=lambda p: p.stat().st_mtime)
                 kept = duplicates[0]
                 for dup in duplicates[1:]:
-                    entries.append(FileEntry(
-                        path=dup,
-                        size_bytes=size,
-                        description=f"Duplicate of: {kept.name}",
-                        is_leaf=True,
-                        file_count=1,
-                    ))
+                    entries.append(
+                        FileEntry(
+                            path=dup,
+                            size_bytes=size,
+                            description=f"Duplicate of: {kept.name}",
+                            is_leaf=True,
+                            file_count=1,
+                        )
+                    )
                     total += size
 
         return ScanResult(
