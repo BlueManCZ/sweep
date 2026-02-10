@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import logging
-import subprocess
 from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
 from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, dir_size, has_command
+from sweep.utils import command_clean, dir_info, has_command
 
 log = logging.getLogger(__name__)
 
@@ -62,22 +61,4 @@ class DnfCachePlugin(CleanPlugin):
         )
 
     def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        errors: list[str] = []
-        size_before = dir_size(_DNF_CACHE_DIR)
-
-        try:
-            subprocess.run(
-                ["dnf", "clean", "all"],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except subprocess.CalledProcessError as e:
-            errors.append(f"dnf clean failed: {e.stderr.strip()}")
-
-        size_after = dir_size(_DNF_CACHE_DIR)
-        freed = max(0, size_before - size_after)
-
-        return CleanResult(
-            plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=len(entries) if freed > 0 else 0
-        )
+        return command_clean(self.id, ["dnf", "clean", "all"], _DNF_CACHE_DIR, entries)

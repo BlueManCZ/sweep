@@ -19,7 +19,7 @@ from pathlib import Path
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
 from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_size, has_command, remove_entries
+from sweep.utils import command_clean, has_command, remove_entries
 
 log = logging.getLogger(__name__)
 
@@ -165,27 +165,7 @@ class PacmanCachePlugin(CleanPlugin):
 
     def _clean_paccache(self, entries: list[FileEntry]) -> CleanResult:
         """Clean using paccache."""
-        errors: list[str] = []
-        size_before = dir_size(_PACMAN_CACHE_DIR)
-
-        try:
-            subprocess.run(
-                ["paccache", "-rk3"],
-                check=True,
-                capture_output=True,
-                text=True,
-            )
-        except subprocess.CalledProcessError as e:
-            errors.append(f"paccache failed: {e.stderr.strip()}")
-
-        size_after = dir_size(_PACMAN_CACHE_DIR)
-        freed = max(0, size_before - size_after)
-        return CleanResult(
-            plugin_id=self.id,
-            freed_bytes=freed,
-            errors=errors,
-            files_removed=len(entries) if freed > 0 else 0,
-        )
+        return command_clean(self.id, ["paccache", "-rk3"], _PACMAN_CACHE_DIR, entries)
 
     def _clean_native(self, entries: list[FileEntry]) -> CleanResult:
         """Clean by removing the specific files identified during scan."""
