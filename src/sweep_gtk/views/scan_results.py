@@ -1121,9 +1121,9 @@ class ScanResultsView(Gtk.Box):
             try:
                 for item in path.rglob("*"):
                     try:
-                        if item.is_file(follow_symlinks=False):
+                        if not item.is_symlink() and item.is_file():
                             try:
-                                size = item.stat(follow_symlinks=False).st_size
+                                size = item.lstat().st_size
                             except OSError:
                                 size = 0
                             files.append((str(item.relative_to(path)), size))

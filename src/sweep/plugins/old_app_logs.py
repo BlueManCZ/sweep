@@ -85,7 +85,7 @@ class OldAppLogsPlugin(CleanPlugin):
         try:
             for path in _LOG_DIR.iterdir():
                 try:
-                    if not path.is_file(follow_symlinks=False):
+                    if path.is_symlink() or not path.is_file():
                         continue
                     if path.name in _SKIP_NAMES:
                         continue
