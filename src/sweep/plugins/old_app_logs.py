@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+from datetime import datetime
 from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
@@ -87,12 +88,14 @@ class OldAppLogsPlugin(CleanPlugin):
 
         for path in sorted(self._stale_files()):
             try:
-                size = path.stat().st_size
+                st = path.stat()
+                size = st.st_size
+                modified = datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%d")
                 entries.append(
                     FileEntry(
                         path=path,
                         size_bytes=size,
-                        description=f"Stale log: {path.name}",
+                        description=f"Last modified: {modified}",
                         is_leaf=True,
                         file_count=1,
                     )

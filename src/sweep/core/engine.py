@@ -56,10 +56,23 @@ class SweepEngine:
             List of scan results from each plugin.
         """
         plugins = self._resolve_plugins(plugin_ids, category)
-        if not plugins:
-            return []
-
         results: list[ScanResult] = []
+
+        # Emit empty results for plugins that were requested but filtered out
+        # (not found or unavailable) so streaming callers can track completion.
+        if plugin_ids:
+            scanned_ids = {p.id for p in plugins}
+            for pid in plugin_ids:
+                if pid not in scanned_ids:
+                    plugin = self.registry.get(pid)
+                    name = plugin.name if plugin else pid
+                    result = ScanResult(plugin_id=pid, plugin_name=name)
+                    results.append(result)
+                    if on_result:
+                        on_result(result)
+
+        if not plugins:
+            return results
 
         if (os.cpu_count() or 1) > 1 and len(plugins) > 1:
             self._scan_parallel(plugins, results, on_progress, on_result)
@@ -89,6 +102,10 @@ class SweepEngine:
                     on_progress(plugin.id, "done")
             except Exception:
                 log.exception("Plugin '%s' failed during scan", plugin.id)
+                result = ScanResult(plugin_id=plugin.id, plugin_name=plugin.name)
+                results.append(result)
+                if on_result:
+                    on_result(result)
                 if on_progress:
                     on_progress(plugin.id, "error")
 
@@ -120,6 +137,11 @@ class SweepEngine:
                     on_progress(plugin.id, "done")
             except Exception:
                 log.exception("Plugin '%s' failed during scan", plugin.id)
+                result = ScanResult(plugin_id=plugin.id, plugin_name=plugin.name)
+                with lock:
+                    results.append(result)
+                if on_result:
+                    on_result(result)
                 if on_progress:
                     on_progress(plugin.id, "error")
 

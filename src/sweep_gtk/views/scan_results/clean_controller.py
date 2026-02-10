@@ -308,8 +308,6 @@ class _CleanController:
         view._selection.hide_all()
         for btn in view._browse_buttons:
             btn.set_visible(False)
-        for icon in view._info_icons:
-            icon.set_visible(False)
         for lbl in view._size_labels:
             lbl.set_visible(False)
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
@@ -56,12 +57,14 @@ class RotatedLogsPlugin(CleanPlugin):
                 for path in sorted(_LOG_DIR.glob(pattern)):
                     try:
                         if path.is_file():
-                            size = path.stat().st_size
+                            st = path.stat()
+                            size = st.st_size
+                            modified = datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%d")
                             entries.append(
                                 FileEntry(
                                     path=path,
                                     size_bytes=size,
-                                    description=f"Rotated log: {path.name}",
+                                    description=f"Last modified: {modified}",
                                     is_leaf=True,
                                     file_count=1,
                                 )

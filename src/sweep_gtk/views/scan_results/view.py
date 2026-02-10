@@ -23,7 +23,7 @@ from sweep_gtk.widgets import (
     show_file_browser,
     show_leaf_browser,
 )
-from sweep_gtk.views.scan_results.helpers import _format_subtitle, _common_parent
+from sweep_gtk.views.scan_results.helpers import _format_counts, _common_parent
 from sweep_gtk.views.scan_results.selection import _SelectionState
 from sweep_gtk.views.scan_results.clean_controller import _CleanController
 
@@ -66,12 +66,11 @@ class ScanResultsView(Gtk.Box):
         self._category_groups: dict[str, Adw.PreferencesGroup] = {}
 
         # Per-category sorted children for streaming insertion order
-        # Maps cat_id -> list of (sort_key, widget) pairs
-        self._category_children: dict[str, list[tuple[tuple, Gtk.Widget]]] = {}
+        # Maps cat_id -> list of (size_bytes, sort_order, name, widget) tuples
+        self._category_children: dict[str, list[tuple[int, int, str, Gtk.Widget]]] = {}
 
         # Post-clean UI tracking
         self._browse_buttons: list[Gtk.Button] = []
-        self._info_icons: list[Gtk.Image] = []
         self._size_labels: list[Gtk.Label] = []
         self._plugin_rows: dict[str, Gtk.Widget] = {}
         self._group_plugin_ids: dict[str, list[str]] = {}
@@ -251,6 +250,12 @@ class ScanResultsView(Gtk.Box):
         self._sort_by_size = button.get_active()
         Settings.instance().set(_SORT_KEY, self._sort_by_size)
 
+        if self._scanning:
+            # Re-sort existing items in all categories without full rebuild
+            for cat_id in self._category_children:
+                self._sort_category_items(cat_id)
+            return
+
         # Save expanded state so rows are created already expanded/collapsed
         self._saved_expanded = {key: row.get_expanded() for key, row in self._expander_rows.items()}
         self.populate(self._scan_results)
@@ -264,7 +269,6 @@ class ScanResultsView(Gtk.Box):
         self._clean.clear()
         self._category_groups.clear()
         self._browse_buttons.clear()
-        self._info_icons.clear()
         self._size_labels.clear()
         self._plugin_rows.clear()
         self._group_plugin_ids.clear()
@@ -375,7 +379,7 @@ class ScanResultsView(Gtk.Box):
 
         module_row = Adw.ExpanderRow()
         module_row.set_title(result["plugin_name"])
-        module_row.set_subtitle(_format_subtitle(result["total_bytes"], total_files, noun, result["file_count"]))
+        module_row.set_subtitle(_format_counts(total_files, noun, result["file_count"]))
         plugin_id = result["plugin_id"]
         if plugin_id in self._saved_expanded:
             module_row.set_expanded(self._saved_expanded[plugin_id])
@@ -388,15 +392,12 @@ class ScanResultsView(Gtk.Box):
         module_icon = Gtk.Image.new_from_icon_name(result.get("icon", "application-x-executable-symbolic"))
         module_row.add_prefix(module_icon)
 
-        # Info icon with filesystem path tooltip
-        entry_paths = [Path(e["path"]) for e in result["entries"]]
-        if entry_paths:
-            info_icon = Gtk.Image.new_from_icon_name("dialog-information-symbolic")
-            info_icon.set_tooltip_text(str(_common_parent(entry_paths)))
-            info_icon.add_css_class("dim-label")
-            info_icon.set_valign(Gtk.Align.CENTER)
-            module_row.add_suffix(info_icon)
-            self._info_icons.append(info_icon)
+        # Size label
+        size_label = Gtk.Label(label=bytes_to_human(result["total_bytes"]))
+        size_label.add_css_class("numeric")
+        size_label.add_css_class("dim-label")
+        module_row.add_suffix(size_label)
+        self._size_labels.append(size_label)
 
         self._add_clean_status_widgets(module_row, result["plugin_id"])
 
@@ -419,6 +420,8 @@ class ScanResultsView(Gtk.Box):
 
             if is_dir and child_count > 0:
                 row.set_subtitle(f"{child_count:,} file{'s' if child_count != 1 else ''}")
+            elif entry.get("description"):
+                row.set_subtitle(entry["description"])
 
             # Size label
             if is_dir and entry["size_bytes"] == 0:
@@ -507,20 +510,12 @@ class ScanResultsView(Gtk.Box):
 
         row = Adw.ActionRow()
         row.set_title(result["plugin_name"])
-        row.set_subtitle(_format_subtitle(result["total_bytes"], total_files, noun, result["file_count"]))
+        row.set_subtitle(_format_counts(total_files, noun, result["file_count"]))
         row.add_prefix(Gtk.Image.new_from_icon_name(result.get("icon", "application-x-executable-symbolic")))
 
-        # Info icon with filesystem path tooltip
-        entry_paths = [Path(e["path"]) for e in result["entries"]]
-        if entry_paths:
-            info_icon = Gtk.Image.new_from_icon_name("dialog-information-symbolic")
-            info_icon.set_tooltip_text(str(_common_parent(entry_paths)))
-            info_icon.add_css_class("dim-label")
-            info_icon.set_valign(Gtk.Align.CENTER)
-            row.add_suffix(info_icon)
-            self._info_icons.append(info_icon)
-
         self._add_clean_status_widgets(row, result["plugin_id"])
+
+        entry_paths = [Path(e["path"]) for e in result["entries"]]
 
         # Size label
         size_label = Gtk.Label(label=bytes_to_human(result["total_bytes"]))
@@ -615,7 +610,7 @@ class ScanResultsView(Gtk.Box):
         group_id = group_meta["id"]
         group_row = Adw.ExpanderRow()
         group_row.set_title(group_meta["name"])
-        group_row.set_subtitle(_format_subtitle(group_total_bytes, group_total_files, "file", group_entry_count))
+        group_row.set_subtitle(_format_counts(group_total_files, "file", group_entry_count))
         if group_id in self._saved_expanded:
             group_row.set_expanded(self._saved_expanded[group_id])
         self._expander_rows[group_id] = group_row
@@ -623,6 +618,13 @@ class ScanResultsView(Gtk.Box):
         group_check = Gtk.CheckButton(active=True, valign=Gtk.Align.CENTER)
         group_row.add_prefix(group_check)
         group_row.add_prefix(Gtk.Image.new_from_icon_name(group_icon))
+
+        # Size label
+        size_label = Gtk.Label(label=bytes_to_human(group_total_bytes))
+        size_label.add_css_class("numeric")
+        size_label.add_css_class("dim-label")
+        group_row.add_suffix(size_label)
+        self._size_labels.append(size_label)
 
         self._add_clean_status_widgets(group_row, group_id, is_group=True)
         cat_group.add(group_row)
@@ -697,7 +699,6 @@ class ScanResultsView(Gtk.Box):
         self._category_groups.clear()
         self._category_children.clear()
         self._browse_buttons.clear()
-        self._info_icons.clear()
         self._size_labels.clear()
         self._plugin_rows.clear()
         self._group_plugin_ids.clear()
@@ -720,7 +721,6 @@ class ScanResultsView(Gtk.Box):
         self._progress_revealer.set_reveal_child(True)
         self.action_bar.set_visible(False)
         self._toolbar_revealer.set_reveal_child(False)
-        self.sort_btn.set_sensitive(False)
 
     def add_streaming_result(self, result: dict, generation: int) -> None:
         """Add a single scan result during streaming. Called via GLib.idle_add.
@@ -753,9 +753,15 @@ class ScanResultsView(Gtk.Box):
         elif not is_empty:
             cat_group = self._get_or_create_category_group(cat_id)
             self._populate_simple_plugin(result, cat_group)
-            # Track for sorted insertion within category
-            sort_key = (result.get("sort_order", 50), result["plugin_name"].lower())
-            self._category_children.setdefault(cat_id, []).append((sort_key, self._expander_rows[result["plugin_id"]]))
+            # Track metadata for sorted insertion within category
+            self._category_children.setdefault(cat_id, []).append(
+                (
+                    result["total_bytes"],
+                    result.get("sort_order", 50),
+                    result["plugin_name"].lower(),
+                    self._expander_rows[result["plugin_id"]],
+                )
+            )
             self._sort_category_items(cat_id)
         else:
             return  # standalone empty result — nothing to render yet
@@ -791,7 +797,10 @@ class ScanResultsView(Gtk.Box):
 
         cat_group = self._get_or_create_category_group(cat_id)
         remaining = expected - len(pending)
-        actionable.sort(key=lambda r: (r.get("sort_order", 50), r["plugin_name"].lower()))
+        if self._sort_by_size:
+            actionable.sort(key=lambda r: r["total_bytes"], reverse=True)
+        else:
+            actionable.sort(key=lambda r: (r.get("sort_order", 50), r["plugin_name"].lower()))
 
         if remaining <= 0:
             self._populate_group_result(actionable, cat_group)
@@ -799,11 +808,18 @@ class ScanResultsView(Gtk.Box):
         else:
             self._build_partial_group(actionable, group, remaining, cat_group)
 
-        # Track for sorted insertion within category
+        # Track metadata for sorted insertion within category
+        group_total = sum(r["total_bytes"] for r in actionable)
         best = actionable[0]
-        group_sort_key = (best.get("sort_order", 50), best["plugin_name"].lower())
         group_widget = self._group_widgets[group_id][1]
-        self._category_children.setdefault(cat_id, []).append((group_sort_key, group_widget))
+        self._category_children.setdefault(cat_id, []).append(
+            (
+                group_total,
+                best.get("sort_order", 50),
+                best["plugin_name"].lower(),
+                group_widget,
+            )
+        )
         self._sort_category_items(cat_id)
 
     def _teardown_streaming_group(
@@ -824,7 +840,7 @@ class ScanResultsView(Gtk.Box):
         # Remove from category children tracking
         if cat_id in self._category_children:
             self._category_children[cat_id] = [
-                (sk, w) for sk, w in self._category_children[cat_id] if w is not old_expander
+                item for item in self._category_children[cat_id] if item[3] is not old_expander
             ]
 
         # Clean up checks for previously rendered (non-empty) members
@@ -858,11 +874,18 @@ class ScanResultsView(Gtk.Box):
 
         group_row = Adw.ExpanderRow()
         group_row.set_title(group_meta["name"])
-        group_row.set_subtitle(_format_subtitle(group_total_bytes, group_total_files, "file", group_entry_count))
+        group_row.set_subtitle(_format_counts(group_total_files, "file", group_entry_count))
 
         group_check = Gtk.CheckButton(active=True, valign=Gtk.Align.CENTER)
         group_row.add_prefix(group_check)
         group_row.add_prefix(Gtk.Image.new_from_icon_name(group_icon))
+
+        # Size label
+        size_label = Gtk.Label(label=bytes_to_human(group_total_bytes))
+        size_label.add_css_class("numeric")
+        size_label.add_css_class("dim-label")
+        group_row.add_suffix(size_label)
+        self._size_labels.append(size_label)
 
         cat_group.add(group_row)
         self._group_widgets[group_id] = (cat_group, group_row)
@@ -911,15 +934,21 @@ class ScanResultsView(Gtk.Box):
             self.prefs_page.add(g)
 
     def _sort_category_items(self, cat_id: str) -> None:
-        """Re-sort items within a category group to maintain correct display order."""
+        """Re-sort items within a category group to maintain correct display order.
+
+        Each entry in _category_children is (size_bytes, sort_order, name, widget).
+        """
         children = self._category_children.get(cat_id)
         if not children or len(children) <= 1:
             return
         cat_group = self._category_groups[cat_id]
-        for _, widget in children:
+        for _, _, _, widget in children:
             cat_group.remove(widget)
-        children.sort(key=lambda x: x[0])
-        for _, widget in children:
+        if self._sort_by_size:
+            children.sort(key=lambda x: (-x[0], x[2]))
+        else:
+            children.sort(key=lambda x: (x[1], x[2]))
+        for _, _, _, widget in children:
             cat_group.add(widget)
 
     def finish_streaming_scan(self) -> float:
@@ -930,7 +959,6 @@ class ScanResultsView(Gtk.Box):
         """
         elapsed = time.monotonic() - self._scan_start_time
         self._scanning = False
-        self.sort_btn.set_sensitive(True)
 
         # Stop progress indicators, keep banner visible with summary
         self._progress_spinner.set_spinning(False)

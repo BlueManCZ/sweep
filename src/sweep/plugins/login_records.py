@@ -55,7 +55,7 @@ class LoginRecordsPlugin(CleanPlugin):
                     FileEntry(
                         path=_WTMP,
                         size_bytes=reclaimable,
-                        description=f"Login records ({size} bytes, keeping 1 MB)",
+                        description="Will be truncated to 1 MB",
                         is_leaf=True,
                         file_count=1,
                     )

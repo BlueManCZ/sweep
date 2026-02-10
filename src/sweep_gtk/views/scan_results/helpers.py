@@ -4,13 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from sweep.utils import bytes_to_human
 
-
-def _format_subtitle(total_bytes: int, total_items: int, noun: str, entry_count: int) -> str:
-    """Build the standard 'size · N items · M entries' subtitle."""
+def _format_counts(total_items: int, noun: str, entry_count: int) -> str:
+    """Build the 'N items · M entries' part without size."""
     return (
-        f"{bytes_to_human(total_bytes)}  \u00b7  "
         f"{total_items:,} {noun}{'s' if total_items != 1 else ''}  \u00b7  "
         f"{entry_count} entr{'ies' if entry_count != 1 else 'y'}"
     )
