@@ -7,8 +7,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries, xdg_data_home
+from sweep.utils import dir_info, xdg_data_home
 
 log = logging.getLogger(__name__)
 
@@ -67,7 +66,3 @@ class TrashPlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} items in trash totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

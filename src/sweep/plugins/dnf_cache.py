@@ -21,10 +21,7 @@ class DnfCachePlugin(CleanPlugin):
 
     id = "dnf_cache"
     name = "DNF Cache"
-    description = (
-        "Removes cached DNF metadata and packages. "
-        "DNF will re-download metadata when needed."
-    )
+    description = "Removes cached DNF metadata and packages. " "DNF will re-download metadata when needed."
     category = "package_manager"
     icon = "system-software-install-symbolic"
     requires_root = True

@@ -8,8 +8,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin, PluginGroup
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries
+from sweep.utils import dir_info
 
 log = logging.getLogger(__name__)
 
@@ -211,10 +210,6 @@ class OldKernelsPlugin(CleanPlugin):
             summary=f"Found {len(entries)} old kernel files totaling {total} bytes",
         )
 
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)
-
 
 class OldKernelModulesPlugin(CleanPlugin):
     """Removes /lib/modules directories for old kernels."""
@@ -227,6 +222,7 @@ class OldKernelModulesPlugin(CleanPlugin):
     group = _GROUP
     requires_root = True
     risk_level = "aggressive"
+    _count_files = True
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -275,10 +271,6 @@ class OldKernelModulesPlugin(CleanPlugin):
             summary=f"Found {len(entries)} old module directories totaling {total} bytes",
         )
 
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)
-
 
 class OldKernelSourcesPlugin(CleanPlugin):
     """Removes old kernel source trees from /usr/src.
@@ -297,6 +289,7 @@ class OldKernelSourcesPlugin(CleanPlugin):
     group = _GROUP
     requires_root = True
     risk_level = "aggressive"
+    _count_files = True
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -346,7 +339,3 @@ class OldKernelSourcesPlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} old kernel source trees totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

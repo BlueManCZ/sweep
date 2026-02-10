@@ -8,8 +8,7 @@ from pathlib import Path
 
 from sweep.models.plugin import CleanPlugin
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.models.clean_result import CleanResult
-from sweep.utils import dir_info, remove_entries, xdg_cache_home
+from sweep.utils import dir_info, xdg_cache_home
 
 log = logging.getLogger(__name__)
 
@@ -106,6 +105,7 @@ class UserCachePlugin(CleanPlugin):
 
     id = "user_cache"
     name = "User Cache"
+    _count_files = True
     description = (
         "Removes cached files from ~/.cache. Excludes critical caches like "
         "font and shader caches. Applications will regenerate these files as needed."
@@ -175,7 +175,3 @@ class UserCachePlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} cache directories totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=removed)

@@ -7,10 +7,8 @@ import logging
 import re
 from pathlib import Path
 
-from sweep.models.clean_result import CleanResult
 from sweep.models.plugin import CleanPlugin, PluginGroup
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.utils import remove_entries
 
 log = logging.getLogger(__name__)
 
@@ -133,13 +131,4 @@ class DownloadDuplicatesPlugin(CleanPlugin):
             entries=entries,
             total_bytes=total,
             summary=f"Found {len(entries)} duplicate files totaling {total} bytes",
-        )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(
-            plugin_id=self.id,
-            freed_bytes=freed,
-            files_removed=removed,
-            errors=errors,
         )

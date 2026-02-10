@@ -33,6 +33,7 @@ class NvidiaComputeCachePlugin(MultiDirPlugin):
     risk_level = "moderate"
     icon = "video-display-symbolic"
     group = _GROUP
+
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
         return (Path.home() / ".nv" / "ComputeCache",)

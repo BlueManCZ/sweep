@@ -79,6 +79,9 @@ class CleanPlugin(ABC):
         """Singular noun for cleaned items, e.g. 'file', 'package', 'runtime'."""
         return "file"
 
+    _count_files: bool = False
+    """Whether to count individual files inside directories during clean."""
+
     @abstractmethod
     def scan(self) -> ScanResult:
         """Scan for cleanable files. MUST NOT delete anything."""
@@ -95,11 +98,21 @@ class CleanPlugin(ABC):
         return self._do_clean(entries)
 
     def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        """Implement cleaning logic for the given entries.
+        """Remove the given file entries and return a CleanResult.
 
-        Override this in subclasses. entries is guaranteed non-None.
+        The default implementation uses ``remove_entries()`` which handles
+        both files and directories.  Override in subclasses that need
+        custom clean logic (e.g. calling external commands).
         """
-        raise NotImplementedError(f"{type(self).__name__} must implement _do_clean()")
+        from sweep.utils import remove_entries
+
+        freed, removed, errors = remove_entries(entries, count_files=self._count_files)
+        return CleanResult(
+            plugin_id=self.id,
+            freed_bytes=freed,
+            files_removed=removed,
+            errors=errors,
+        )
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -121,6 +134,8 @@ class SimpleCacheDirPlugin(CleanPlugin, ABC):
     Subclasses only need to define metadata properties (id, name, description)
     and _cache_dir_name. All scan/clean/availability logic is provided.
     """
+
+    _count_files = True
 
     @property
     @abstractmethod
@@ -188,17 +203,6 @@ class SimpleCacheDirPlugin(CleanPlugin, ABC):
             entries=entries,
             total_bytes=total,
             summary=f"Found {len(entries)} {self._label} cache entries totaling {total} bytes",
-        )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        from sweep.utils import remove_entries
-
-        freed, removed, errors = remove_entries(entries, count_files=True)
-        return CleanResult(
-            plugin_id=self.id,
-            freed_bytes=freed,
-            errors=errors,
-            files_removed=removed,
         )
 
 

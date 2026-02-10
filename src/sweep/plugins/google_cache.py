@@ -29,6 +29,7 @@ class GoogleEarthCachePlugin(MultiDirPlugin):
     category = "application"
     icon = "system-run-symbolic"
     group = _GROUP
+
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:
         return (Path.home() / ".googleearth" / "Cache",)

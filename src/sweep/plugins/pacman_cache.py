@@ -68,8 +68,7 @@ class PacmanCachePlugin(CleanPlugin):
     id = "pacman_cache"
     name = "Pacman Cache"
     description = (
-        "Removes old package versions from the pacman cache, keeping the "
-        "3 most recent versions of each package."
+        "Removes old package versions from the pacman cache, keeping the " "3 most recent versions of each package."
     )
     category = "package_manager"
     icon = "system-software-install-symbolic"

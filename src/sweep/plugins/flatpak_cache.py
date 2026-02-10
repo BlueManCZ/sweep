@@ -19,10 +19,7 @@ class FlatpakCachePlugin(CleanPlugin):
 
     id = "flatpak_cache"
     name = "Flatpak Unused Runtimes"
-    description = (
-        "Removes Flatpak runtimes and extensions that are no longer used by "
-        "any installed application."
-    )
+    description = "Removes Flatpak runtimes and extensions that are no longer used by " "any installed application."
     category = "package_manager"
     icon = "application-x-addon-symbolic"
     risk_level = "moderate"

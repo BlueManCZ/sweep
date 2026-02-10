@@ -14,7 +14,7 @@ from pathlib import Path
 from sweep.models.clean_result import CleanResult
 from sweep.models.plugin import CleanPlugin, PluginGroup
 from sweep.models.scan_result import FileEntry, ScanResult
-from sweep.utils import dir_info, remove_entries
+from sweep.utils import dir_info
 
 log = logging.getLogger(__name__)
 
@@ -177,10 +177,6 @@ class PortageDistfilesPlugin(CleanPlugin):
             summary=f"Found {len(entries)} obsolete distfiles totaling {total} bytes",
         )
 
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, files_removed=removed, errors=errors)
-
 
 class PortagePackagesPlugin(CleanPlugin):
     """Cleans obsolete Portage binary packages."""
@@ -256,10 +252,6 @@ class PortagePackagesPlugin(CleanPlugin):
             total_bytes=total,
             summary=f"Found {len(entries)} obsolete binary packages totaling {total} bytes",
         )
-
-    def _do_clean(self, entries: list[FileEntry]) -> CleanResult:
-        freed, removed, errors = remove_entries(entries)
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, files_removed=removed, errors=errors)
 
 
 class PortageDepcleanPlugin(CleanPlugin):
