@@ -20,32 +20,15 @@ _ONE_DAY = 86400  # seconds
 class TmpFilesPlugin(CleanPlugin):
     """Cleans user-owned files in /tmp that are older than 1 day."""
 
-    @property
-    def id(self) -> str:
-        return "tmp_files"
-
-    @property
-    def name(self) -> str:
-        return "Temporary Files"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes user-owned temporary files in /tmp older than 1 day. "
-            "Active applications may still be using recent temp files."
-        )
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 30
-
-    @property
-    def icon(self) -> str:
-        return "edit-clear-symbolic"
+    id = "tmp_files"
+    name = "Temporary Files"
+    description = (
+        "Removes user-owned temporary files in /tmp older than 1 day. "
+        "Active applications may still be using recent temp files."
+    )
+    category = "user"
+    sort_order = 30
+    icon = "edit-clear-symbolic"
 
     def has_items(self) -> bool:
         uid = os.getuid()

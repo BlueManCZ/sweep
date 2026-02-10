@@ -19,32 +19,15 @@ _TRACKER_DIRS = ("tracker", "tracker3")
 class TrackerCachePlugin(CleanPlugin):
     """Cleans the GNOME Tracker file indexing cache."""
 
-    @property
-    def id(self) -> str:
-        return "tracker_cache"
-
-    @property
-    def name(self) -> str:
-        return "Tracker Search Index"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes the Tracker file indexing database used for desktop search. "
-            "Tracker will rebuild the index automatically in the background."
-        )
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 21
-
-    @property
-    def icon(self) -> str:
-        return "system-search-symbolic"
+    id = "tracker_cache"
+    name = "Tracker Search Index"
+    description = (
+        "Removes the Tracker file indexing database used for desktop search. "
+        "Tracker will rebuild the index automatically in the background."
+    )
+    category = "user"
+    sort_order = 21
+    icon = "system-search-symbolic"
 
     def _tracker_dirs(self) -> list[Path]:
         cache = xdg_cache_home()

@@ -12,29 +12,12 @@ class CopilotCachePlugin(SimpleCacheDirPlugin):
     completions. These files are rebuilt automatically as you work.
     """
 
-    @property
-    def id(self) -> str:
-        return "copilot_cache"
-
-    @property
-    def name(self) -> str:
-        return "GitHub Copilot Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes cached project indexes and context data from GitHub "
-            "Copilot. Indexes will be rebuilt automatically as you work."
-        )
-
-    @property
-    def category(self) -> str:
-        return "development"
-
-    @property
-    def icon(self) -> str:
-        return "github-symbolic"
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "github-copilot"
+    id = "copilot_cache"
+    name = "GitHub Copilot Cache"
+    description = (
+        "Removes cached project indexes and context data from GitHub "
+        "Copilot. Indexes will be rebuilt automatically as you work."
+    )
+    category = "development"
+    icon = "github-symbolic"
+    _cache_dir_name = "github-copilot"

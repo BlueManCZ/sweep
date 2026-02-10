@@ -14,29 +14,12 @@ class SpotifyCachePlugin(SimpleCacheDirPlugin):
     to be re-downloaded.
     """
 
-    @property
-    def id(self) -> str:
-        return "spotify_cache"
-
-    @property
-    def name(self) -> str:
-        return "Spotify Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes cached audio, album art, and browser data from "
-            "Spotify. Offline downloads will need to be re-downloaded."
-        )
-
-    @property
-    def icon(self) -> str:
-        return "audio-x-generic-symbolic"
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "spotify"
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
+    id = "spotify_cache"
+    name = "Spotify Cache"
+    description = (
+        "Removes cached audio, album art, and browser data from "
+        "Spotify. Offline downloads will need to be re-downloaded."
+    )
+    icon = "audio-x-generic-symbolic"
+    risk_level = "moderate"
+    _cache_dir_name = "spotify"

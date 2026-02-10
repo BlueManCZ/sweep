@@ -65,35 +65,16 @@ def _find_removable_packages() -> list[Path]:
 class PacmanCachePlugin(CleanPlugin):
     """Cleans old pacman package cache, keeping the 3 most recent versions."""
 
-    @property
-    def id(self) -> str:
-        return "pacman_cache"
-
-    @property
-    def name(self) -> str:
-        return "Pacman Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes old package versions from the pacman cache, keeping the " "3 most recent versions of each package."
-        )
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
+    id = "pacman_cache"
+    name = "Pacman Cache"
+    description = (
+        "Removes old package versions from the pacman cache, keeping the "
+        "3 most recent versions of each package."
+    )
+    category = "package_manager"
+    icon = "system-software-install-symbolic"
+    requires_root = True
+    risk_level = "moderate"
 
     @property
     def unavailable_reason(self) -> str | None:

@@ -19,29 +19,15 @@ _DNF_CACHE_DIR = Path("/var/cache/dnf")
 class DnfCachePlugin(CleanPlugin):
     """Cleans DNF package manager cache."""
 
-    @property
-    def id(self) -> str:
-        return "dnf_cache"
-
-    @property
-    def name(self) -> str:
-        return "DNF Cache"
-
-    @property
-    def description(self) -> str:
-        return "Removes cached DNF metadata and packages. " "DNF will re-download metadata when needed."
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
+    id = "dnf_cache"
+    name = "DNF Cache"
+    description = (
+        "Removes cached DNF metadata and packages. "
+        "DNF will re-download metadata when needed."
+    )
+    category = "package_manager"
+    icon = "system-software-install-symbolic"
+    requires_root = True
 
     @property
     def unavailable_reason(self) -> str | None:

@@ -10,94 +10,31 @@ _GROUP = PluginGroup("wine", "Wine Tools Cache", "Downloaded installers and runt
 class WineCachePlugin(SimpleCacheDirPlugin):
     """Cleans Wine download cache."""
 
-    @property
-    def id(self) -> str:
-        return "wine_cache"
-
-    @property
-    def name(self) -> str:
-        return "Wine"
-
-    @property
-    def description(self) -> str:
-        return "Wine download cache (Mono, Gecko installers)"
-
-    @property
-    def icon(self) -> str:
-        return "applications-games-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "wine"
-
-    @property
-    def _label(self) -> str:
-        return "Wine"
+    id = "wine_cache"
+    name = "Wine"
+    description = "Wine download cache (Mono, Gecko installers)"
+    icon = "applications-games-symbolic"
+    group = _GROUP
+    _cache_dir_name = "wine"
 
 
 class WinetricksCachePlugin(SimpleCacheDirPlugin):
     """Cleans Winetricks download cache."""
 
-    @property
-    def id(self) -> str:
-        return "winetricks_cache"
-
-    @property
-    def name(self) -> str:
-        return "Winetricks"
-
-    @property
-    def description(self) -> str:
-        return "Winetricks download cache"
-
-    @property
-    def icon(self) -> str:
-        return "applications-games-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "winetricks"
-
-    @property
-    def _label(self) -> str:
-        return "Winetricks"
+    id = "winetricks_cache"
+    name = "Winetricks"
+    description = "Winetricks download cache"
+    icon = "applications-games-symbolic"
+    group = _GROUP
+    _cache_dir_name = "winetricks"
 
 
 class ProtontricksCachePlugin(SimpleCacheDirPlugin):
     """Cleans Protontricks download cache."""
 
-    @property
-    def id(self) -> str:
-        return "protontricks_cache"
-
-    @property
-    def name(self) -> str:
-        return "Protontricks"
-
-    @property
-    def description(self) -> str:
-        return "Protontricks download cache"
-
-    @property
-    def icon(self) -> str:
-        return "applications-games-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "protontricks"
-
-    @property
-    def _label(self) -> str:
-        return "Protontricks"
+    id = "protontricks_cache"
+    name = "Protontricks"
+    description = "Protontricks download cache"
+    icon = "applications-games-symbolic"
+    group = _GROUP
+    _cache_dir_name = "protontricks"

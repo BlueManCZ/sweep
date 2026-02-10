@@ -18,32 +18,15 @@ _COREDUMP_DIR = Path("/var/lib/systemd/coredump")
 class CoredumpsPlugin(CleanPlugin):
     """Cleans systemd coredump files."""
 
-    @property
-    def id(self) -> str:
-        return "coredumps"
-
-    @property
-    def name(self) -> str:
-        return "Core Dumps"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes systemd core dump files from /var/lib/systemd/coredump. "
-            "These are crash snapshots typically only useful for debugging."
-        )
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "dialog-warning-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
+    id = "coredumps"
+    name = "Core Dumps"
+    description = (
+        "Removes systemd core dump files from /var/lib/systemd/coredump. "
+        "These are crash snapshots typically only useful for debugging."
+    )
+    category = "system"
+    icon = "dialog-warning-symbolic"
+    requires_root = True
 
     @property
     def unavailable_reason(self) -> str | None:

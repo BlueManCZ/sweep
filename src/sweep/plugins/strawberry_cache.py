@@ -12,25 +12,11 @@ class StrawberryCachePlugin(SimpleCacheDirPlugin):
     These files are regenerated automatically when needed.
     """
 
-    @property
-    def id(self) -> str:
-        return "strawberry_cache"
-
-    @property
-    def name(self) -> str:
-        return "Strawberry Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes cached album art and network data from the Strawberry "
-            "Music Player. Caches will be rebuilt as you browse your library."
-        )
-
-    @property
-    def icon(self) -> str:
-        return "media-playback-start-symbolic"
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "strawberry"
+    id = "strawberry_cache"
+    name = "Strawberry Cache"
+    description = (
+        "Removes cached album art and network data from the Strawberry "
+        "Music Player. Caches will be rebuilt as you browse your library."
+    )
+    icon = "media-playback-start-symbolic"
+    _cache_dir_name = "strawberry"

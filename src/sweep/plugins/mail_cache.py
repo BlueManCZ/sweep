@@ -24,137 +24,48 @@ _MAILSPRING_CACHE_SUBDIRS = [
 class ThunderbirdCachePlugin(SimpleCacheDirPlugin):
     """Cleans Thunderbird mail client cache."""
 
-    @property
-    def id(self) -> str:
-        return "thunderbird_cache"
-
-    @property
-    def name(self) -> str:
-        return "Thunderbird"
-
-    @property
-    def description(self) -> str:
-        return "Thunderbird cache data"
-
-    @property
-    def category(self) -> str:
-        return "mail"
-
-    @property
-    def icon(self) -> str:
-        return "mail-unread-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "thunderbird"
-
-    @property
-    def _label(self) -> str:
-        return "Thunderbird"
+    id = "thunderbird_cache"
+    name = "Thunderbird"
+    description = "Thunderbird cache data"
+    category = "mail"
+    icon = "mail-unread-symbolic"
+    group = _GROUP
+    _cache_dir_name = "thunderbird"
 
 
 class EvolutionCachePlugin(SimpleCacheDirPlugin):
     """Cleans Evolution mail client cache."""
 
-    @property
-    def id(self) -> str:
-        return "evolution_cache"
-
-    @property
-    def name(self) -> str:
-        return "Evolution"
-
-    @property
-    def description(self) -> str:
-        return "Evolution cache data"
-
-    @property
-    def category(self) -> str:
-        return "mail"
-
-    @property
-    def icon(self) -> str:
-        return "mail-unread-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "evolution"
-
-    @property
-    def _label(self) -> str:
-        return "Evolution"
+    id = "evolution_cache"
+    name = "Evolution"
+    description = "Evolution cache data"
+    category = "mail"
+    icon = "mail-unread-symbolic"
+    group = _GROUP
+    _cache_dir_name = "evolution"
 
 
 class GearyCachePlugin(SimpleCacheDirPlugin):
     """Cleans Geary mail client cache."""
 
-    @property
-    def id(self) -> str:
-        return "geary_cache"
-
-    @property
-    def name(self) -> str:
-        return "Geary"
-
-    @property
-    def description(self) -> str:
-        return "Geary cache data"
-
-    @property
-    def category(self) -> str:
-        return "mail"
-
-    @property
-    def icon(self) -> str:
-        return "mail-unread-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "geary"
-
-    @property
-    def _label(self) -> str:
-        return "Geary"
+    id = "geary_cache"
+    name = "Geary"
+    description = "Geary cache data"
+    category = "mail"
+    icon = "mail-unread-symbolic"
+    group = _GROUP
+    _cache_dir_name = "geary"
 
 
 class MailspringCachePlugin(MultiDirPlugin):
     """Cleans Mailspring mail client cache directories."""
 
-    @property
-    def id(self) -> str:
-        return "mailspring_cache"
-
-    @property
-    def name(self) -> str:
-        return "Mailspring"
-
-    @property
-    def description(self) -> str:
-        return "Mailspring cache data"
-
-    @property
-    def category(self) -> str:
-        return "mail"
-
-    @property
-    def icon(self) -> str:
-        return "mail-unread-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "mailspring_cache"
+    name = "Mailspring"
+    description = "Mailspring cache data"
+    category = "mail"
+    icon = "mail-unread-symbolic"
+    group = _GROUP
 
     @property
     def _cache_dirs(self) -> tuple[Path, ...]:

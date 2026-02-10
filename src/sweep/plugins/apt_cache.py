@@ -19,32 +19,15 @@ _APT_CACHE_DIR = Path("/var/cache/apt/archives")
 class AptCachePlugin(CleanPlugin):
     """Cleans downloaded APT package files."""
 
-    @property
-    def id(self) -> str:
-        return "apt_cache"
-
-    @property
-    def name(self) -> str:
-        return "APT Package Cache"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes downloaded .deb package files from /var/cache/apt/archives. "
-            "These are no longer needed after installation."
-        )
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
+    id = "apt_cache"
+    name = "APT Package Cache"
+    description = (
+        "Removes downloaded .deb package files from /var/cache/apt/archives. "
+        "These are no longer needed after installation."
+    )
+    category = "package_manager"
+    icon = "system-software-install-symbolic"
+    requires_root = True
 
     @property
     def unavailable_reason(self) -> str | None:

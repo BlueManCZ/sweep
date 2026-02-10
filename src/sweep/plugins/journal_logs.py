@@ -19,36 +19,16 @@ _JOURNAL_DIR = Path("/var/log/journal")
 class JournalLogsPlugin(CleanPlugin):
     """Cleans old systemd journal logs using journalctl vacuum."""
 
-    @property
-    def id(self) -> str:
-        return "journal_logs"
-
-    @property
-    def name(self) -> str:
-        return "Journal Logs"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes old systemd journal logs, keeping the most recent 100 MB. "
-            "Logs are rotated automatically; older entries are rarely needed."
-        )
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "text-x-generic-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def item_noun(self) -> str:
-        return "log"
+    id = "journal_logs"
+    name = "Journal Logs"
+    description = (
+        "Removes old systemd journal logs, keeping the most recent 100 MB. "
+        "Logs are rotated automatically; older entries are rarely needed."
+    )
+    category = "system"
+    icon = "text-x-generic-symbolic"
+    requires_root = True
+    item_noun = "log"
 
     @property
     def unavailable_reason(self) -> str | None:

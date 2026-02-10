@@ -10,62 +10,20 @@ _GROUP = PluginGroup("electron", "Electron Cache", "Chromium engine caches from 
 class ElectronCachePlugin(SimpleCacheDirPlugin):
     """Cleans Electron framework cache (GPU shaders, code caches, binaries)."""
 
-    @property
-    def id(self) -> str:
-        return "electron_cache"
-
-    @property
-    def name(self) -> str:
-        return "Electron"
-
-    @property
-    def description(self) -> str:
-        return "Electron framework cache"
-
-    @property
-    def icon(self) -> str:
-        return "utilities-terminal-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "electron"
-
-    @property
-    def _label(self) -> str:
-        return "Electron"
+    id = "electron_cache"
+    name = "Electron"
+    description = "Electron framework cache"
+    icon = "utilities-terminal-symbolic"
+    group = _GROUP
+    _cache_dir_name = "electron"
 
 
 class ElectronBuilderCachePlugin(SimpleCacheDirPlugin):
     """Cleans Electron Builder packaging cache."""
 
-    @property
-    def id(self) -> str:
-        return "electron_builder_cache"
-
-    @property
-    def name(self) -> str:
-        return "Electron Builder"
-
-    @property
-    def description(self) -> str:
-        return "Electron Builder packaging cache"
-
-    @property
-    def icon(self) -> str:
-        return "utilities-terminal-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "electron-builder"
-
-    @property
-    def _label(self) -> str:
-        return "Electron Builder"
+    id = "electron_builder_cache"
+    name = "Electron Builder"
+    description = "Electron Builder packaging cache"
+    icon = "utilities-terminal-symbolic"
+    group = _GROUP
+    _cache_dir_name = "electron-builder"

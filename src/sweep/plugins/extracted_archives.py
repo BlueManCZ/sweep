@@ -39,41 +39,15 @@ def _strip_archive_ext(name: str) -> str | None:
 class ExtractedArchivesPlugin(CleanPlugin):
     """Finds archive files whose contents have already been extracted alongside them."""
 
-    @property
-    def id(self) -> str:
-        return "extracted_archives"
-
-    @property
-    def name(self) -> str:
-        return "Extracted Archives"
-
-    @property
-    def description(self) -> str:
-        return "Archive files with a matching extracted directory in Downloads"
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def group(self) -> PluginGroup:
-        return _GROUP
-
-    @property
-    def icon(self) -> str:
-        return "package-x-generic-symbolic"
-
-    @property
-    def risk_level(self) -> str:
-        return "safe"
-
-    @property
-    def sort_order(self) -> int:
-        return 41
-
-    @property
-    def item_noun(self) -> str:
-        return "archive"
+    id = "extracted_archives"
+    name = "Extracted Archives"
+    description = "Archive files with a matching extracted directory in Downloads"
+    category = "user"
+    group = _GROUP
+    icon = "package-x-generic-symbolic"
+    risk_level = "safe"
+    sort_order = 41
+    item_noun = "archive"
 
     @property
     def unavailable_reason(self) -> str | None:

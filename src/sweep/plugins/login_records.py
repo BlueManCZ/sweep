@@ -18,41 +18,18 @@ _THRESHOLD = 1 * 1024 * 1024  # 1 MB
 class LoginRecordsPlugin(CleanPlugin):
     """Truncates /var/log/wtmp when it grows beyond 1 MB."""
 
-    @property
-    def id(self) -> str:
-        return "login_records"
-
-    @property
-    def name(self) -> str:
-        return "Login Records"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Truncates /var/log/wtmp, the binary log of all login/logout "
-            "events. The file is truncated (not deleted) so the 'last' "
-            "command continues to work."
-        )
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "system-users-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def item_noun(self) -> str:
-        return "record"
+    id = "login_records"
+    name = "Login Records"
+    description = (
+        "Truncates /var/log/wtmp, the binary log of all login/logout "
+        "events. The file is truncated (not deleted) so the 'last' "
+        "command continues to work."
+    )
+    category = "system"
+    icon = "system-users-symbolic"
+    requires_root = True
+    risk_level = "moderate"
+    item_noun = "record"
 
     @property
     def unavailable_reason(self) -> str | None:

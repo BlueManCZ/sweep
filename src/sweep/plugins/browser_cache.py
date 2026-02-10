@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from sweep.models.plugin import PluginGroup, SimpleCacheDirPlugin
 
 _GROUP = PluginGroup("browser", "Browser Cache", "Cached web pages, scripts, and media")
@@ -12,286 +10,94 @@ _GROUP = PluginGroup("browser", "Browser Cache", "Cached web pages, scripts, and
 class FirefoxCachePlugin(SimpleCacheDirPlugin):
     """Cleans Firefox browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "firefox_cache"
-
-    @property
-    def name(self) -> str:
-        return "Firefox"
-
-    @property
-    def description(self) -> str:
-        return "Firefox HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "mozilla/firefox"
-
-    @property
-    def _label(self) -> str:
-        return "Firefox"
+    id = "firefox_cache"
+    name = "Firefox"
+    description = "Firefox HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "mozilla/firefox"
 
 
 class ChromiumCachePlugin(SimpleCacheDirPlugin):
     """Cleans Chromium browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "chromium_cache"
-
-    @property
-    def name(self) -> str:
-        return "Chromium"
-
-    @property
-    def description(self) -> str:
-        return "Chromium HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "chromium"
-
-    @property
-    def _label(self) -> str:
-        return "Chromium"
+    id = "chromium_cache"
+    name = "Chromium"
+    description = "Chromium HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "chromium"
 
 
 class ChromeCachePlugin(SimpleCacheDirPlugin):
     """Cleans Google Chrome browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "chrome_cache"
-
-    @property
-    def name(self) -> str:
-        return "Google Chrome"
-
-    @property
-    def description(self) -> str:
-        return "Google Chrome HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "google-chrome"
-
-    @property
-    def _label(self) -> str:
-        return "Google Chrome"
+    id = "chrome_cache"
+    name = "Google Chrome"
+    description = "Google Chrome HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "google-chrome"
 
 
 class OperaCachePlugin(SimpleCacheDirPlugin):
     """Cleans Opera browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "opera_cache"
-
-    @property
-    def name(self) -> str:
-        return "Opera"
-
-    @property
-    def description(self) -> str:
-        return "Opera HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "opera"
-
-    @property
-    def _label(self) -> str:
-        return "Opera"
+    id = "opera_cache"
+    name = "Opera"
+    description = "Opera HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "opera"
 
 
 class ZenCachePlugin(SimpleCacheDirPlugin):
     """Cleans Zen browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "zen_cache"
-
-    @property
-    def name(self) -> str:
-        return "Zen"
-
-    @property
-    def description(self) -> str:
-        return "Zen HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "zen"
-
-    @property
-    def _label(self) -> str:
-        return "Zen"
+    id = "zen_cache"
+    name = "Zen"
+    description = "Zen HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "zen"
 
 
 class BraveCachePlugin(SimpleCacheDirPlugin):
     """Cleans Brave browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "brave_cache"
-
-    @property
-    def name(self) -> str:
-        return "Brave"
-
-    @property
-    def description(self) -> str:
-        return "Brave HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "BraveSoftware/Brave-Browser"
-
-    @property
-    def _label(self) -> str:
-        return "Brave"
+    id = "brave_cache"
+    name = "Brave"
+    description = "Brave HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "BraveSoftware/Brave-Browser"
 
 
 class EdgeCachePlugin(SimpleCacheDirPlugin):
     """Cleans Microsoft Edge browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "edge_cache"
-
-    @property
-    def name(self) -> str:
-        return "Microsoft Edge"
-
-    @property
-    def description(self) -> str:
-        return "Microsoft Edge HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "microsoft-edge"
-
-    @property
-    def _label(self) -> str:
-        return "Microsoft Edge"
+    id = "edge_cache"
+    name = "Microsoft Edge"
+    description = "Microsoft Edge HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "microsoft-edge"
 
 
 class EpiphanyCachePlugin(SimpleCacheDirPlugin):
     """Cleans Epiphany (GNOME Web) browser cache."""
 
-    @property
-    def id(self) -> str:
-        return "epiphany_cache"
-
-    @property
-    def name(self) -> str:
-        return "Epiphany"
-
-    @property
-    def description(self) -> str:
-        return "Epiphany HTTP cache"
-
-    @property
-    def category(self) -> str:
-        return "browser"
-
-    @property
-    def icon(self) -> str:
-        return "web-browser-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def _cache_dir_name(self) -> str:
-        return "epiphany"
-
-    @property
-    def _label(self) -> str:
-        return "Epiphany"
+    id = "epiphany_cache"
+    name = "Epiphany"
+    description = "Epiphany HTTP cache"
+    category = "browser"
+    icon = "web-browser-symbolic"
+    group = _GROUP
+    _cache_dir_name = "epiphany"

@@ -6,6 +6,9 @@
 - After you make code changes, check if you did not introduce any redundant code. If you find any, remove it.
 - Avoid dynamic imports unless absolutely necessary. Static imports help with type checking and code analysis.
 
+## Codebase specific rules
+- If you want to check that your changes don't break anything, you can run `make test` and `make black`.
+
 ## Refactoring rules
 - When you read code that could benefit from refactoring, suggest and implement the refactor.
 - Focus on improving code readability, maintainability, and reducing complexity.

@@ -112,41 +112,15 @@ def _calc_depclean_candidates() -> list[str]:
 class PortageDistfilesPlugin(CleanPlugin):
     """Cleans obsolete Portage source distfiles."""
 
-    @property
-    def id(self) -> str:
-        return "portage_distfiles"
-
-    @property
-    def name(self) -> str:
-        return "Source Distfiles"
-
-    @property
-    def description(self) -> str:
-        return "Obsolete source archives from /var/cache/distfiles"
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def item_noun(self) -> str:
-        return "file"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "portage_distfiles"
+    name = "Source Distfiles"
+    description = "Obsolete source archives from /var/cache/distfiles"
+    category = "package_manager"
+    icon = "system-software-install-symbolic"
+    requires_root = True
+    risk_level = "moderate"
+    item_noun = "file"
+    group = _GROUP
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -211,41 +185,15 @@ class PortageDistfilesPlugin(CleanPlugin):
 class PortagePackagesPlugin(CleanPlugin):
     """Cleans obsolete Portage binary packages."""
 
-    @property
-    def id(self) -> str:
-        return "portage_packages"
-
-    @property
-    def name(self) -> str:
-        return "Binary Packages"
-
-    @property
-    def description(self) -> str:
-        return "Obsolete binary packages from /var/cache/binpkgs"
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def item_noun(self) -> str:
-        return "file"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "portage_packages"
+    name = "Binary Packages"
+    description = "Obsolete binary packages from /var/cache/binpkgs"
+    category = "package_manager"
+    icon = "system-software-install-symbolic"
+    requires_root = True
+    risk_level = "moderate"
+    item_noun = "file"
+    group = _GROUP
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -317,41 +265,15 @@ class PortagePackagesPlugin(CleanPlugin):
 class PortageDepcleanPlugin(CleanPlugin):
     """Cleans orphaned installed packages no longer needed as dependencies."""
 
-    @property
-    def id(self) -> str:
-        return "portage_depclean"
-
-    @property
-    def name(self) -> str:
-        return "Orphaned Packages"
-
-    @property
-    def description(self) -> str:
-        return "Packages no longer needed as dependencies"
-
-    @property
-    def category(self) -> str:
-        return "package_manager"
-
-    @property
-    def icon(self) -> str:
-        return "system-software-install-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "moderate"
-
-    @property
-    def item_noun(self) -> str:
-        return "package"
-
-    @property
-    def group(self):
-        return _GROUP
+    id = "portage_depclean"
+    name = "Orphaned Packages"
+    description = "Packages no longer needed as dependencies"
+    category = "package_manager"
+    icon = "system-software-install-symbolic"
+    requires_root = True
+    risk_level = "moderate"
+    item_noun = "package"
+    group = _GROUP
 
     @property
     def unavailable_reason(self) -> str | None:

@@ -142,37 +142,14 @@ def _sources_keep_names() -> set[str]:
 class OldKernelsPlugin(CleanPlugin):
     """Removes old kernel images, keeping current and one previous."""
 
-    @property
-    def id(self) -> str:
-        return "old_kernels"
-
-    @property
-    def name(self) -> str:
-        return "Old Kernel Images"
-
-    @property
-    def description(self) -> str:
-        return "Removes old Linux kernel images from /boot, keeping the " "running kernel and one previous version."
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "computer-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "aggressive"
+    id = "old_kernels"
+    name = "Old Kernel Images"
+    description = "Removes old Linux kernel images from /boot, keeping the running kernel and one previous version."
+    category = "system"
+    icon = "computer-symbolic"
+    group = _GROUP
+    requires_root = True
+    risk_level = "aggressive"
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -242,37 +219,14 @@ class OldKernelsPlugin(CleanPlugin):
 class OldKernelModulesPlugin(CleanPlugin):
     """Removes /lib/modules directories for old kernels."""
 
-    @property
-    def id(self) -> str:
-        return "old_kernel_modules"
-
-    @property
-    def name(self) -> str:
-        return "Old Kernel Modules"
-
-    @property
-    def description(self) -> str:
-        return "Removes /lib/modules directories for kernel versions that " "no longer have a kernel image in /boot."
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "computer-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "aggressive"
+    id = "old_kernel_modules"
+    name = "Old Kernel Modules"
+    description = "Removes /lib/modules directories for kernel versions that no longer have a kernel image in /boot."
+    category = "system"
+    icon = "computer-symbolic"
+    group = _GROUP
+    requires_root = True
+    risk_level = "aggressive"
 
     @property
     def unavailable_reason(self) -> str | None:
@@ -335,37 +289,14 @@ class OldKernelSourcesPlugin(CleanPlugin):
     source trees and offers to remove them.
     """
 
-    @property
-    def id(self) -> str:
-        return "old_kernel_sources"
-
-    @property
-    def name(self) -> str:
-        return "Old Kernel Sources"
-
-    @property
-    def description(self) -> str:
-        return "Removes old kernel source trees from /usr/src that no longer " "match any installed or running kernel."
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "computer-symbolic"
-
-    @property
-    def group(self):
-        return _GROUP
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "aggressive"
+    id = "old_kernel_sources"
+    name = "Old Kernel Sources"
+    description = "Removes old kernel source trees from /usr/src that no longer match any installed or running kernel."
+    category = "system"
+    icon = "computer-symbolic"
+    group = _GROUP
+    requires_root = True
+    risk_level = "aggressive"
 
     @property
     def unavailable_reason(self) -> str | None:

@@ -25,40 +25,17 @@ _ROTATED_PATTERNS = (
 class RotatedLogsPlugin(CleanPlugin):
     """Cleans rotated syslog files (*.0, *.N.gz) in /var/log."""
 
-    @property
-    def id(self) -> str:
-        return "rotated_logs"
-
-    @property
-    def name(self) -> str:
-        return "Rotated System Logs"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes rotated log files (auth.log.1.gz, syslog.2.gz, etc.) "
-            "in /var/log. The current log files are kept intact."
-        )
-
-    @property
-    def category(self) -> str:
-        return "system"
-
-    @property
-    def icon(self) -> str:
-        return "text-x-generic-symbolic"
-
-    @property
-    def requires_root(self) -> bool:
-        return True
-
-    @property
-    def risk_level(self) -> str:
-        return "safe"
-
-    @property
-    def item_noun(self) -> str:
-        return "log"
+    id = "rotated_logs"
+    name = "Rotated System Logs"
+    description = (
+        "Removes rotated log files (auth.log.1.gz, syslog.2.gz, etc.) "
+        "in /var/log. The current log files are kept intact."
+    )
+    category = "system"
+    icon = "text-x-generic-symbolic"
+    requires_root = True
+    risk_level = "safe"
+    item_noun = "log"
 
     @property
     def unavailable_reason(self) -> str | None:

@@ -16,32 +16,15 @@ log = logging.getLogger(__name__)
 class ThumbnailsPlugin(CleanPlugin):
     """Cleans the freedesktop thumbnail cache (~/.cache/thumbnails)."""
 
-    @property
-    def id(self) -> str:
-        return "thumbnails"
-
-    @property
-    def name(self) -> str:
-        return "Thumbnails"
-
-    @property
-    def description(self) -> str:
-        return (
-            "Removes cached thumbnail images. File managers and image viewers "
-            "will regenerate thumbnails when browsing directories."
-        )
-
-    @property
-    def category(self) -> str:
-        return "user"
-
-    @property
-    def sort_order(self) -> int:
-        return 20
-
-    @property
-    def icon(self) -> str:
-        return "image-x-generic-symbolic"
+    id = "thumbnails"
+    name = "Thumbnails"
+    description = (
+        "Removes cached thumbnail images. File managers and image viewers "
+        "will regenerate thumbnails when browsing directories."
+    )
+    category = "user"
+    sort_order = 20
+    icon = "image-x-generic-symbolic"
 
     def _thumb_dir(self) -> Path:
         return xdg_cache_home() / "thumbnails"
