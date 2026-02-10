@@ -16,7 +16,13 @@ from gi.repository import Adw, Gtk
 from sweep.settings import Settings
 from sweep.utils import bytes_to_human, format_elapsed as _format_elapsed
 from sweep_gtk.constants import CATEGORY_LABELS
-from sweep_gtk.widgets import icon_label as _icon_label, show_file_browser, show_leaf_browser
+from sweep_gtk.widgets import (
+    icon_label as _icon_label,
+    reveal_in_file_manager,
+    show_dirs_browser,
+    show_file_browser,
+    show_leaf_browser,
+)
 from sweep_gtk.views.scan_results.helpers import _format_subtitle, _common_parent
 from sweep_gtk.views.scan_results.selection import _SelectionState
 from sweep_gtk.views.scan_results.clean_controller import _CleanController
@@ -62,6 +68,15 @@ class ScanResultsView(Gtk.Box):
         # Per-category sorted children for streaming insertion order
         # Maps cat_id -> list of (sort_key, widget) pairs
         self._category_children: dict[str, list[tuple[tuple, Gtk.Widget]]] = {}
+
+        # Post-clean UI tracking
+        self._browse_buttons: list[Gtk.Button] = []
+        self._info_icons: list[Gtk.Image] = []
+        self._size_labels: list[Gtk.Label] = []
+        self._plugin_rows: dict[str, Gtk.Widget] = {}
+        self._group_plugin_ids: dict[str, list[str]] = {}
+        self._plugin_to_cat: dict[str, str] = {}
+        self._nothing_found_group: Adw.PreferencesGroup | None = None
 
         self._build_progress_ui()
         self._build_toolbar()
@@ -150,17 +165,29 @@ class ScanResultsView(Gtk.Box):
         group.add(widget)
         return group
 
-    def _add_clean_status_widgets(self, row: Adw.ActionRow | Adw.ExpanderRow, plugin_id: str) -> None:
-        """Add hidden spinner + checkmark + label for per-plugin clean progress."""
+    def _add_clean_status_widgets(
+        self, row: Adw.ActionRow | Adw.ExpanderRow, entity_id: str, *, is_group: bool = False
+    ) -> None:
+        """Add hidden spinner + checkmark + label for clean progress."""
         spinner = Gtk.Spinner(visible=False, valign=Gtk.Align.CENTER)
         check_img = Gtk.Image(visible=False, valign=Gtk.Align.CENTER)
         label = Gtk.Label(visible=False, valign=Gtk.Align.CENTER)
         label.add_css_class("caption")
         label.add_css_class("dim-label")
-        row.add_suffix(spinner)
-        row.add_suffix(check_img)
-        row.add_suffix(label)
-        self._clean.register_plugin(plugin_id, spinner, check_img, label)
+        # ExpanderRow stacks suffixes right-to-left; reverse order so
+        # the visual result matches ActionRow: [spinner] [✓] [label]
+        if isinstance(row, Adw.ExpanderRow):
+            row.add_suffix(label)
+            row.add_suffix(check_img)
+            row.add_suffix(spinner)
+        else:
+            row.add_suffix(spinner)
+            row.add_suffix(check_img)
+            row.add_suffix(label)
+        if is_group:
+            self._clean.register_group(entity_id, spinner, check_img, label)
+        else:
+            self._clean.register_plugin(entity_id, spinner, check_img, label)
 
     def _build_progress_ui(self) -> None:
         """Build the progress indicator shared by scan and clean workflows."""
@@ -236,6 +263,13 @@ class ScanResultsView(Gtk.Box):
         self._expander_rows.clear()
         self._clean.clear()
         self._category_groups.clear()
+        self._browse_buttons.clear()
+        self._info_icons.clear()
+        self._size_labels.clear()
+        self._plugin_rows.clear()
+        self._group_plugin_ids.clear()
+        self._plugin_to_cat.clear()
+        self._nothing_found_group = None
 
         # Clear existing groups
         for group in self._groups:
@@ -287,6 +321,9 @@ class ScanResultsView(Gtk.Box):
         self.prefs_page.add(cat_group)
         self._groups.append(cat_group)
         self._category_groups[cat_id] = cat_group
+
+        for result in results:
+            self._plugin_to_cat[result["plugin_id"]] = cat_id
 
         # Partition into plugin groups and standalone
         grouped: dict[str, list[dict]] = {}
@@ -343,6 +380,7 @@ class ScanResultsView(Gtk.Box):
         if plugin_id in self._saved_expanded:
             module_row.set_expanded(self._saved_expanded[plugin_id])
         self._expander_rows[plugin_id] = module_row
+        self._plugin_rows[plugin_id] = module_row
 
         module_check = Gtk.CheckButton(active=True, valign=Gtk.Align.CENTER)
         module_row.add_prefix(module_check)
@@ -358,6 +396,7 @@ class ScanResultsView(Gtk.Box):
             info_icon.add_css_class("dim-label")
             info_icon.set_valign(Gtk.Align.CENTER)
             module_row.add_suffix(info_icon)
+            self._info_icons.append(info_icon)
 
         self._add_clean_status_widgets(module_row, result["plugin_id"])
 
@@ -399,6 +438,18 @@ class ScanResultsView(Gtk.Box):
                 view_btn.set_tooltip_text("Browse files")
                 view_btn.connect("clicked", lambda _, p=entry["path"]: show_file_browser(self.window, p))
                 row.add_suffix(view_btn)
+                self._browse_buttons.append(view_btn)
+
+            # Reveal in File Manager button (skip when Browse files is already shown)
+            if not (is_dir and child_count > 0):
+                fm_btn = Gtk.Button.new_from_icon_name("folder-open-symbolic")
+                fm_btn.add_css_class("flat")
+                fm_btn.set_valign(Gtk.Align.CENTER)
+                fm_btn.set_tooltip_text("Open in File Manager")
+                uri = entry_path.as_uri()
+                fm_btn.connect("clicked", lambda _, u=uri: reveal_in_file_manager(u))
+                row.add_suffix(fm_btn)
+                self._browse_buttons.append(fm_btn)
 
             # Per-entry checkbox
             check = Gtk.CheckButton(active=True, valign=Gtk.Align.CENTER)
@@ -467,6 +518,7 @@ class ScanResultsView(Gtk.Box):
             info_icon.add_css_class("dim-label")
             info_icon.set_valign(Gtk.Align.CENTER)
             row.add_suffix(info_icon)
+            self._info_icons.append(info_icon)
 
         self._add_clean_status_widgets(row, result["plugin_id"])
 
@@ -475,6 +527,7 @@ class ScanResultsView(Gtk.Box):
         size_label.add_css_class("numeric")
         size_label.add_css_class("dim-label")
         row.add_suffix(size_label)
+        self._size_labels.append(size_label)
 
         # Browse button — shows all entries for this plugin
         if entry_paths:
@@ -495,8 +548,15 @@ class ScanResultsView(Gtk.Box):
                     lambda _, bp=str(browse_path), li=leaf_items, n=noun: show_leaf_browser(self.window, bp, li, n),
                 )
             else:
-                view_btn.connect("clicked", lambda _, bp=str(browse_path): show_file_browser(self.window, bp))
+                # Browse only this plugin's directories, not the entire common parent
+                view_btn.connect(
+                    "clicked",
+                    lambda _, d=list(entry_paths), bp=browse_path, t=result["plugin_name"]: show_dirs_browser(
+                        self.window, d, bp, t
+                    ),
+                )
             row.add_suffix(view_btn)
+            self._browse_buttons.append(view_btn)
 
         # Single checkbox for the whole plugin
         member_check = Gtk.CheckButton(active=True, valign=Gtk.Align.CENTER)
@@ -524,6 +584,7 @@ class ScanResultsView(Gtk.Box):
         member_check.connect("toggled", self._selection.on_module_toggled, hidden_checks)
         self._selection.add_module(member_check, result["plugin_id"], hidden_checks)
 
+        self._plugin_rows[result["plugin_id"]] = row
         return row, member_check
 
     def _populate_group_result(
@@ -563,6 +624,7 @@ class ScanResultsView(Gtk.Box):
         group_row.add_prefix(group_check)
         group_row.add_prefix(Gtk.Image.new_from_icon_name(group_icon))
 
+        self._add_clean_status_widgets(group_row, group_id, is_group=True)
         cat_group.add(group_row)
 
         # Create flat member rows inside the group expander
@@ -571,6 +633,8 @@ class ScanResultsView(Gtk.Box):
             member_row, member_check = self._create_group_member_row(result)
             group_row.add_row(member_row)
             member_module_checks.append(member_check)
+
+        self._group_plugin_ids[group_id] = [r["plugin_id"] for r in member_results]
 
         # Wire group checkbox → all member module checks
         group_check.connect("toggled", self._selection.on_group_toggled, member_module_checks)
@@ -584,6 +648,7 @@ class ScanResultsView(Gtk.Box):
         )
         self.prefs_page.add(group)
         self._groups.append(group)
+        self._nothing_found_group = group
 
         for result in empty_results:
             row = Adw.ActionRow()
@@ -631,6 +696,13 @@ class ScanResultsView(Gtk.Box):
         self._expander_rows.clear()
         self._category_groups.clear()
         self._category_children.clear()
+        self._browse_buttons.clear()
+        self._info_icons.clear()
+        self._size_labels.clear()
+        self._plugin_rows.clear()
+        self._group_plugin_ids.clear()
+        self._plugin_to_cat.clear()
+        self._nothing_found_group = None
 
         # Set streaming state
         self._scanning = True

@@ -155,11 +155,11 @@ class _SelectionState:
             )
         return entries_by_plugin
 
-    def disable_all(self) -> None:
-        """Disable all checkboxes (post-clean)."""
+    def hide_all(self) -> None:
+        """Hide all checkboxes (post-clean)."""
         for check, _ in self._entry_checks:
-            check.set_sensitive(False)
+            check.set_visible(False)
         for check, _, _ in self._module_checks:
-            check.set_sensitive(False)
+            check.set_visible(False)
         for check, _ in self._group_checks:
-            check.set_sensitive(False)
+            check.set_visible(False)

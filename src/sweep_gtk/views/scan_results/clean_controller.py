@@ -34,6 +34,10 @@ class _CleanController:
         self._clean_total: int = 0
         self._clean_completed: int = 0
         self._clean_done: bool = False
+        self._group_clean_status: dict[str, tuple[Gtk.Spinner, Gtk.Image, Gtk.Label]] = {}
+        self._plugin_to_group: dict[str, str] = {}
+        self._group_clean_tracking: dict[str, dict] = {}
+        self._plugin_names: dict[str, str] = {}
 
     @property
     def is_done(self) -> bool:
@@ -41,9 +45,13 @@ class _CleanController:
 
     def clear(self) -> None:
         self._clean_status.clear()
+        self._group_clean_status.clear()
 
     def register_plugin(self, plugin_id: str, spinner: Gtk.Spinner, check_img: Gtk.Image, label: Gtk.Label) -> None:
         self._clean_status[plugin_id] = (spinner, check_img, label)
+
+    def register_group(self, group_id: str, spinner: Gtk.Spinner, check_img: Gtk.Image, label: Gtk.Label) -> None:
+        self._group_clean_status[group_id] = (spinner, check_img, label)
 
     def remove_plugin_ids(self, plugin_ids: set[str]) -> None:
         for pid in plugin_ids:
@@ -117,6 +125,28 @@ class _CleanController:
         view.clean_btn.set_label("Cleaning\u2026")
         view._toolbar_revealer.set_reveal_child(False)
 
+        # Hide rows not being cleaned
+        for plugin_id, row in view._plugin_rows.items():
+            if plugin_id not in entries_by_plugin:
+                row.set_visible(False)
+
+        # Hide group expanders where no members are being cleaned
+        for group_id, member_ids in view._group_plugin_ids.items():
+            if not any(pid in entries_by_plugin for pid in member_ids):
+                expander = view._expander_rows.get(group_id)
+                if expander:
+                    expander.set_visible(False)
+
+        # Hide category groups with nothing being cleaned
+        cleaned_cats = {view._plugin_to_cat[pid] for pid in entries_by_plugin if pid in view._plugin_to_cat}
+        for cat_id, cat_group in view._category_groups.items():
+            if cat_id not in cleaned_cats:
+                cat_group.set_visible(False)
+
+        # Hide the "Nothing Found" group
+        if view._nothing_found_group:
+            view._nothing_found_group.set_visible(False)
+
         # Overall clean progress
         self._clean_total = len(entries_by_plugin)
         self._clean_completed = 0
@@ -129,6 +159,29 @@ class _CleanController:
         # Show spinners for plugins being cleaned
         for plugin_id in entries_by_plugin:
             status = self._clean_status.get(plugin_id)
+            if status:
+                spinner, _, _ = status
+                spinner.set_visible(True)
+                spinner.set_spinning(True)
+
+        # Initialize group-level tracking
+        self._plugin_names = {r["plugin_id"]: r["plugin_name"] for r in view._scan_results}
+        self._plugin_to_group.clear()
+        self._group_clean_tracking.clear()
+        for group_id, member_ids in view._group_plugin_ids.items():
+            members_cleaning = [pid for pid in member_ids if pid in entries_by_plugin]
+            if not members_cleaning:
+                continue
+            for pid in member_ids:
+                self._plugin_to_group[pid] = group_id
+            self._group_clean_tracking[group_id] = {
+                "expected": len(members_cleaning),
+                "completed": 0,
+                "freed_bytes": 0,
+                "errors": 0,
+                "members": [],
+            }
+            status = self._group_clean_status.get(group_id)
             if status:
                 spinner, _, _ = status
                 spinner.set_visible(True)
@@ -153,27 +206,69 @@ class _CleanController:
 
         plugin_id = result["plugin_id"]
         status = self._clean_status.get(plugin_id)
+        if status:
+            spinner, check_img, label = status
+
+            # Stop and hide spinner
+            spinner.set_spinning(False)
+            spinner.set_visible(False)
+
+            # Show status
+            if result["errors"]:
+                check_img.set_from_icon_name("dialog-warning-symbolic")
+                check_img.add_css_class("warning")
+                label.set_label("Error")
+            else:
+                check_img.set_from_icon_name("emblem-ok-symbolic")
+                check_img.add_css_class("success")
+                label.set_label(f"Freed {bytes_to_human(result['freed_bytes'])}")
+
+            check_img.set_visible(True)
+            label.set_visible(True)
+
+        # Update group-level aggregated status
+        group_id = self._plugin_to_group.get(plugin_id)
+        if group_id:
+            tracking = self._group_clean_tracking.get(group_id)
+            if tracking:
+                tracking["completed"] += 1
+                tracking["freed_bytes"] += result["freed_bytes"]
+                tracking["errors"] += len(result["errors"])
+                tracking["members"].append(
+                    {
+                        "name": self._plugin_names.get(plugin_id, plugin_id),
+                        "freed_bytes": result["freed_bytes"],
+                    }
+                )
+                if tracking["completed"] >= tracking["expected"]:
+                    self._finalize_group_clean(group_id, tracking)
+
+    def _finalize_group_clean(self, group_id: str, tracking: dict) -> None:
+        """Show aggregated clean status on the group expander row."""
+        status = self._group_clean_status.get(group_id)
         if not status:
             return
 
         spinner, check_img, label = status
-
-        # Stop and hide spinner
         spinner.set_spinning(False)
         spinner.set_visible(False)
 
-        # Show status
-        if result["errors"]:
+        if tracking["errors"] > 0:
             check_img.set_from_icon_name("dialog-warning-symbolic")
             check_img.add_css_class("warning")
-            label.set_label("Error")
         else:
             check_img.set_from_icon_name("emblem-ok-symbolic")
             check_img.add_css_class("success")
-            label.set_label(f"Freed {bytes_to_human(result['freed_bytes'])}")
+        label.set_label(f"Freed {bytes_to_human(tracking['freed_bytes'])}")
 
         check_img.set_visible(True)
         label.set_visible(True)
+
+        # Update subtitle with cleaned member summary
+        expander = self._view._expander_rows.get(group_id)
+        if expander:
+            parts = [f"{m['name']} \u2014 {bytes_to_human(m['freed_bytes'])}" for m in tracking["members"]]
+            expander.set_subtitle(", ".join(parts))
 
     def _on_all_clean_complete(self, results: list[dict]) -> None:
         view = self._view
@@ -206,8 +301,17 @@ class _CleanController:
         view.clean_btn.add_css_class("suggested-action")
         view._toolbar_revealer.set_reveal_child(False)
 
-        # Disable all checkboxes — the items have been deleted
-        view._selection.disable_all()
+        # Post-clean UI cleanup — collapse, hide checkboxes and browse buttons
+        for expander in view._expander_rows.values():
+            if expander.get_visible():
+                expander.set_expanded(False)
+        view._selection.hide_all()
+        for btn in view._browse_buttons:
+            btn.set_visible(False)
+        for icon in view._info_icons:
+            icon.set_visible(False)
+        for lbl in view._size_labels:
+            lbl.set_visible(False)
 
         view.window.dashboard_view.refresh()
         view.window.modules_view.refresh()

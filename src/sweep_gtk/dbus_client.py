@@ -85,7 +85,7 @@ class SweepClient:
                     "path": str(e.path),
                     "size_bytes": e.size_bytes,
                     "description": e.description,
-                    "is_dir": not e.is_leaf and e.path.is_dir(),
+                    "is_dir": e.path.is_dir(),
                     "is_leaf": e.is_leaf,
                     "child_count": e.file_count or 1,
                 }
