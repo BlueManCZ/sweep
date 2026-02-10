@@ -217,8 +217,7 @@ class SweepEngine:
                 name = plugin.name if plugin else plugin_id
                 result = CleanResult(
                     plugin_id=plugin_id,
-                    errors=[f"Plugin '{name}' requires root privileges to clean "
-                            "(pkexec not available)"],
+                    errors=[f"Plugin '{name}' requires root privileges to clean " "(pkexec not available)"],
                 )
                 results.append(result)
                 if on_result:

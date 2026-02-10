@@ -33,9 +33,7 @@ class DashboardView(Gtk.Box):
         self._scan_results: list[dict] = []
 
         # Plugin metadata for display names, categories, and group info
-        self._plugin_info: dict[str, dict] = {
-            p["id"]: p for p in self.window.client.list_plugins()
-        }
+        self._plugin_info: dict[str, dict] = {p["id"]: p for p in self.window.client.list_plugins()}
 
         # ── Scrolled container ────────────────────────────────
         scrolled = Gtk.ScrolledWindow(
@@ -156,9 +154,7 @@ class DashboardView(Gtk.Box):
 
         # ── Responsive layout ─────────────────────────────────
         self._layout_mode = "wide"
-        scrolled.get_hadjustment().connect(
-            "notify::page-size", self._on_viewport_resize
-        )
+        scrolled.get_hadjustment().connect("notify::page-size", self._on_viewport_resize)
 
         # Load historical stats and kick off the quick scan
         self._refresh_stats()
@@ -198,7 +194,8 @@ class DashboardView(Gtk.Box):
         gen = self._scan_generation
 
         quick_ids = [
-            pid for pid, info in self._plugin_info.items()
+            pid
+            for pid, info in self._plugin_info.items()
             if info["available"] and info["category"] not in _SLOW_CATEGORIES
         ]
 
@@ -252,9 +249,7 @@ class DashboardView(Gtk.Box):
             self._hero_icon.set_from_icon_name("emblem-ok-symbolic")
             self._hero_title.set_label("Your System is Clean")
             self._review_btn.set_visible(False)
-            self._hero_description.set_label(
-                last_clean_text or "Nothing to clean right now"
-            )
+            self._hero_description.set_label(last_clean_text or "Nothing to clean right now")
 
         self._populate_breakdown(results, total)
 
@@ -299,21 +294,20 @@ class DashboardView(Gtk.Box):
                     groups[gid]["total_bytes"] += r["total_bytes"]
                     groups[gid]["file_count"] += r["file_count"]
                 else:
-                    items.append({
-                        "name": r["plugin_name"],
-                        "icon": r.get("icon", "application-x-executable-symbolic"),
-                        "total_bytes": r["total_bytes"],
-                        "file_count": r["file_count"],
-                    })
+                    items.append(
+                        {
+                            "name": r["plugin_name"],
+                            "icon": r.get("icon", "application-x-executable-symbolic"),
+                            "total_bytes": r["total_bytes"],
+                            "file_count": r["file_count"],
+                        }
+                    )
 
             items.extend(groups.values())
             cat_display[cat] = items
 
         # Sort categories by total bytes (descending)
-        cat_totals = {
-            cat: sum(it["total_bytes"] for it in items)
-            for cat, items in cat_display.items()
-        }
+        cat_totals = {cat: sum(it["total_bytes"] for it in items) for cat, items in cat_display.items()}
         sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=True)
 
         for cat in sorted_cats:
@@ -423,24 +417,28 @@ class DashboardView(Gtk.Box):
                 group_agg[gid]["bytes_freed"] += pstats["bytes_freed"]
                 group_agg[gid]["files_removed"] += pstats["files_removed"]
             else:
-                display_items.append({
-                    "name": info["name"] if info else pid,
-                    "icon": info.get("icon", "application-x-executable-symbolic") if info else "folder-symbolic",
-                    "noun": info.get("item_noun", "file") if info else "file",
-                    "category": cat,
-                    "bytes_freed": pstats["bytes_freed"],
-                    "files_removed": pstats["files_removed"],
-                })
+                display_items.append(
+                    {
+                        "name": info["name"] if info else pid,
+                        "icon": info.get("icon", "application-x-executable-symbolic") if info else "folder-symbolic",
+                        "noun": info.get("item_noun", "file") if info else "file",
+                        "category": cat,
+                        "bytes_freed": pstats["bytes_freed"],
+                        "files_removed": pstats["files_removed"],
+                    }
+                )
 
         for agg in group_agg.values():
-            display_items.append({
-                "name": agg["name"],
-                "icon": agg["icon"],
-                "noun": "file",
-                "category": agg["category"],
-                "bytes_freed": agg["bytes_freed"],
-                "files_removed": agg["files_removed"],
-            })
+            display_items.append(
+                {
+                    "name": agg["name"],
+                    "icon": agg["icon"],
+                    "noun": "file",
+                    "category": agg["category"],
+                    "bytes_freed": agg["bytes_freed"],
+                    "files_removed": agg["files_removed"],
+                }
+            )
 
         # Group display items by category
         cat_data: dict[str, list[dict]] = {}
@@ -448,10 +446,7 @@ class DashboardView(Gtk.Box):
             cat_data.setdefault(item["category"], []).append(item)
 
         # Sort categories by total bytes freed (descending)
-        cat_totals = {
-            cat: sum(it["bytes_freed"] for it in items)
-            for cat, items in cat_data.items()
-        }
+        cat_totals = {cat: sum(it["bytes_freed"] for it in items) for cat, items in cat_data.items()}
         sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=True)
 
         for cat in sorted_cats:
@@ -504,17 +499,13 @@ class DashboardView(Gtk.Box):
     def _on_safe_scan(self, button: Gtk.Button) -> None:
         """Launch a scan with only safe-risk plugins."""
         safe_ids = [
-            pid for pid, info in self._plugin_info.items()
-            if info["available"] and info["risk_level"] == "safe"
+            pid for pid, info in self._plugin_info.items() if info["available"] and info["risk_level"] == "safe"
         ]
         self.window.launch_scan(safe_ids)
 
     def _on_full_scan(self, button: Gtk.Button) -> None:
         """Launch a scan with all available plugins."""
-        all_ids = [
-            pid for pid, info in self._plugin_info.items()
-            if info["available"]
-        ]
+        all_ids = [pid for pid, info in self._plugin_info.items() if info["available"]]
         self.window.launch_scan(all_ids)
 
     def refresh(self) -> None:

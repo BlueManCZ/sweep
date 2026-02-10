@@ -66,7 +66,11 @@ class AptCachePlugin(CleanPlugin):
             if item.suffix == ".deb":
                 try:
                     size = item.stat().st_size
-                    entries.append(FileEntry(path=item, size_bytes=size, description=f"Package: {item.name}", file_count=1))
+                    entries.append(
+                        FileEntry(
+                            path=item, size_bytes=size, description=f"Package: {item.name}", is_leaf=True, file_count=1
+                        )
+                    )
                     total += size
                 except OSError:
                     log.debug("Cannot access: %s", item)
@@ -96,4 +100,6 @@ class AptCachePlugin(CleanPlugin):
         size_after = dir_size(_APT_CACHE_DIR)
         freed = max(0, size_before - size_after)
 
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=len(entries) if freed > 0 else 0)
+        return CleanResult(
+            plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=len(entries) if freed > 0 else 0
+        )

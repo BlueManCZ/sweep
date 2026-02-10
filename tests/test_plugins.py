@@ -1031,14 +1031,23 @@ class TestIsAvailableDerivation:
 
         class MinimalPlugin(CleanPlugin):
             @property
-            def id(self): return "minimal"
+            def id(self):
+                return "minimal"
+
             @property
-            def name(self): return "Minimal"
+            def name(self):
+                return "Minimal"
+
             @property
-            def description(self): return "test"
+            def description(self):
+                return "test"
+
             @property
-            def category(self): return "user"
-            def scan(self): return ScanResult(plugin_id="minimal", plugin_name="Minimal")
+            def category(self):
+                return "user"
+
+            def scan(self):
+                return ScanResult(plugin_id="minimal", plugin_name="Minimal")
 
         p = MinimalPlugin()
         assert p.unavailable_reason is None
@@ -1051,16 +1060,27 @@ class TestIsAvailableDerivation:
 
         class BrokenPlugin(CleanPlugin):
             @property
-            def id(self): return "broken"
+            def id(self):
+                return "broken"
+
             @property
-            def name(self): return "Broken"
+            def name(self):
+                return "Broken"
+
             @property
-            def description(self): return "test"
+            def description(self):
+                return "test"
+
             @property
-            def category(self): return "user"
+            def category(self):
+                return "user"
+
             @property
-            def unavailable_reason(self): return "missing dependency"
-            def scan(self): return ScanResult(plugin_id="broken", plugin_name="Broken")
+            def unavailable_reason(self):
+                return "missing dependency"
+
+            def scan(self):
+                return ScanResult(plugin_id="broken", plugin_name="Broken")
 
         p = BrokenPlugin()
         assert p.unavailable_reason == "missing dependency"
@@ -1099,6 +1119,7 @@ class TestRotatedLogsPlugin:
 
     def test_unavailable_when_missing(self, tmp_path, monkeypatch):
         import sweep.plugins.rotated_logs as mod
+
         monkeypatch.setattr(mod, "_LOG_DIR", tmp_path / "nonexistent")
         plugin = RotatedLogsPlugin()
         assert plugin.unavailable_reason is not None
@@ -1115,6 +1136,7 @@ class TestRotatedLogsPlugin:
 
     def test_has_items_no_rotated(self, tmp_path, monkeypatch):
         import sweep.plugins.rotated_logs as mod
+
         var_log = tmp_path / "var" / "log"
         var_log.mkdir(parents=True)
         monkeypatch.setattr(mod, "_LOG_DIR", var_log)
@@ -1173,6 +1195,7 @@ class TestLoginRecordsPlugin:
 
     def test_unavailable_when_missing(self, tmp_path, monkeypatch):
         import sweep.plugins.login_records as mod
+
         monkeypatch.setattr(mod, "_WTMP", tmp_path / "nonexistent")
         plugin = LoginRecordsPlugin()
         assert plugin.unavailable_reason is not None
@@ -1189,6 +1212,7 @@ class TestLoginRecordsPlugin:
 
     def test_has_items_small(self, tmp_path, monkeypatch):
         import sweep.plugins.login_records as mod
+
         wtmp = tmp_path / "wtmp"
         wtmp.write_bytes(b"w" * 512)  # 512 bytes, under threshold
         monkeypatch.setattr(mod, "_WTMP", wtmp)
@@ -1205,6 +1229,7 @@ class TestLoginRecordsPlugin:
 
     def test_scan_small(self, tmp_path, monkeypatch):
         import sweep.plugins.login_records as mod
+
         wtmp = tmp_path / "wtmp"
         wtmp.write_bytes(b"w" * 512)
         monkeypatch.setattr(mod, "_WTMP", wtmp)
@@ -1236,12 +1261,14 @@ class TestOldAppLogsPlugin:
         monkeypatch.setattr(mod, "_LOG_DIR", var_log)
 
         import time
+
         old_mtime = time.time() - 120 * 86400  # 120 days ago
 
         # Stale app logs (should be picked up)
         stale1 = var_log / "genkernel.log"
         stale1.write_bytes(b"g" * 4096)
         import os
+
         os.utime(stale1, (old_mtime, old_mtime))
 
         stale2 = var_log / "roonserver.log"
@@ -1282,6 +1309,7 @@ class TestOldAppLogsPlugin:
 
     def test_unavailable_when_missing(self, tmp_path, monkeypatch):
         import sweep.plugins.old_app_logs as mod
+
         monkeypatch.setattr(mod, "_LOG_DIR", tmp_path / "nonexistent")
         plugin = OldAppLogsPlugin()
         assert plugin.unavailable_reason is not None
@@ -1298,6 +1326,7 @@ class TestOldAppLogsPlugin:
 
     def test_has_items_none_stale(self, tmp_path, monkeypatch):
         import sweep.plugins.old_app_logs as mod
+
         var_log = tmp_path / "var" / "log"
         var_log.mkdir(parents=True)
         monkeypatch.setattr(mod, "_LOG_DIR", var_log)

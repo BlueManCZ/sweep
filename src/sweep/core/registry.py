@@ -70,7 +70,4 @@ class PluginRegistry:
 
     def get_group_plugins(self, group_id: str) -> list[CleanPlugin]:
         """Get all plugins belonging to a specific group."""
-        return [
-            p for p in self._plugins.values()
-            if p.group is not None and p.group.id == group_id
-        ]
+        return [p for p in self._plugins.values() if p.group is not None and p.group.id == group_id]

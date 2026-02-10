@@ -76,12 +76,15 @@ class SnapCachePlugin(CleanPlugin):
                     if snap_file.exists():
                         try:
                             size = snap_file.stat().st_size
-                            entries.append(FileEntry(
-                                path=snap_file,
-                                size_bytes=size,
-                                description=f"Snap: {snap_name} rev {revision}",
-                                file_count=1,
-                            ))
+                            entries.append(
+                                FileEntry(
+                                    path=snap_file,
+                                    size_bytes=size,
+                                    description=f"Snap: {snap_name} rev {revision}",
+                                    is_leaf=True,
+                                    file_count=1,
+                                )
+                            )
                             total += size
                         except OSError:
                             pass

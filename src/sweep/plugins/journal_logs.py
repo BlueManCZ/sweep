@@ -64,12 +64,14 @@ class JournalLogsPlugin(CleanPlugin):
         reclaimable = max(0, size - 100 * 1024 * 1024)
         entries: list[FileEntry] = []
         if reclaimable > 0:
-            entries.append(FileEntry(
-                path=_JOURNAL_DIR,
-                size_bytes=reclaimable,
-                description="Systemd journal logs (keeping 100 MB)",
-                file_count=fcount,
-            ))
+            entries.append(
+                FileEntry(
+                    path=_JOURNAL_DIR,
+                    size_bytes=reclaimable,
+                    description="Systemd journal logs (keeping 100 MB)",
+                    file_count=fcount,
+                )
+            )
 
         return ScanResult(
             plugin_id=self.id,
@@ -96,4 +98,6 @@ class JournalLogsPlugin(CleanPlugin):
         size_after = dir_size(_JOURNAL_DIR)
         freed = max(0, size_before - size_after)
 
-        return CleanResult(plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=len(entries) if freed > 0 else 0)
+        return CleanResult(
+            plugin_id=self.id, freed_bytes=freed, errors=errors, files_removed=len(entries) if freed > 0 else 0
+        )

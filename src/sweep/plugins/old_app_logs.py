@@ -16,11 +16,20 @@ log = logging.getLogger(__name__)
 _LOG_DIR = Path("/var/log")
 _MAX_AGE_DAYS = 90
 
-_SKIP_NAMES = frozenset({
-    "syslog", "messages", "kern.log", "auth.log",
-    "wtmp", "btmp", "lastlog", "faillog",
-    "boot", ".keep",
-})
+_SKIP_NAMES = frozenset(
+    {
+        "syslog",
+        "messages",
+        "kern.log",
+        "auth.log",
+        "wtmp",
+        "btmp",
+        "lastlog",
+        "faillog",
+        "boot",
+        ".keep",
+    }
+)
 
 
 class OldAppLogsPlugin(CleanPlugin):
@@ -76,7 +85,7 @@ class OldAppLogsPlugin(CleanPlugin):
         try:
             for path in _LOG_DIR.iterdir():
                 try:
-                    if not path.is_file(follow_symlinks=False):
+                    if path.is_symlink() or not path.is_file():
                         continue
                     if path.name in _SKIP_NAMES:
                         continue
@@ -104,12 +113,15 @@ class OldAppLogsPlugin(CleanPlugin):
         for path in sorted(self._stale_files()):
             try:
                 size = path.stat().st_size
-                entries.append(FileEntry(
-                    path=path,
-                    size_bytes=size,
-                    description=f"Stale log: {path.name}",
-                    file_count=1,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=path,
+                        size_bytes=size,
+                        description=f"Stale log: {path.name}",
+                        is_leaf=True,
+                        file_count=1,
+                    )
+                )
                 total += size
             except OSError:
                 log.debug("Cannot stat: %s", path)

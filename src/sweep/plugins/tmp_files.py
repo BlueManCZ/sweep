@@ -79,7 +79,11 @@ class TmpFilesPlugin(CleanPlugin):
                     size, fcount = dir_info(item)
                 else:
                     size, fcount = stat.st_size, 1
-                entries.append(FileEntry(path=item, size_bytes=size, description=f"Temp: {item.name}", file_count=fcount))
+                entries.append(
+                    FileEntry(
+                        path=item, size_bytes=size, description=f"Temp: {item.name}", is_leaf=True, file_count=fcount
+                    )
+                )
                 total += size
             except OSError:
                 log.debug("Cannot access: %s", item)

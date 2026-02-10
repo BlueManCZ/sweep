@@ -108,13 +108,15 @@ class ExtractedArchivesPlugin(CleanPlugin):
                     log.debug("Cannot stat: %s", item)
                     continue
 
-                entries.append(FileEntry(
-                    path=item,
-                    size_bytes=size,
-                    description=f"Extracted to: {stem}",
-                    is_leaf=True,
-                    file_count=1,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=item,
+                        size_bytes=size,
+                        description=f"Extracted to: {stem}",
+                        is_leaf=True,
+                        file_count=1,
+                    )
+                )
                 total += size
         except OSError:
             log.debug("Cannot list Downloads directory: %s", downloads)

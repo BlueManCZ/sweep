@@ -56,18 +56,14 @@ class SettingsView(Adw.PreferencesPage):
             title="System Plugins",
             subtitle="/usr/share/sweep/plugins/",
         )
-        system_row.add_suffix(
-            Gtk.Image(icon_name="folder-symbolic", css_classes=["dim-label"])
-        )
+        system_row.add_suffix(Gtk.Image(icon_name="folder-symbolic", css_classes=["dim-label"]))
         plugins_group.add(system_row)
 
         user_row = Adw.ActionRow(
             title="User Plugins",
             subtitle="~/.local/share/sweep/plugins/",
         )
-        user_row.add_suffix(
-            Gtk.Image(icon_name="folder-symbolic", css_classes=["dim-label"])
-        )
+        user_row.add_suffix(Gtk.Image(icon_name="folder-symbolic", css_classes=["dim-label"]))
         plugins_group.add(user_row)
 
         # ── History ──────────────────────────────────────────────────
@@ -99,9 +95,7 @@ class SettingsView(Adw.PreferencesPage):
             title="Sweep",
             subtitle=f"Version {__version__}",
         )
-        version_row.add_suffix(
-            Gtk.Image(icon_name="help-about-symbolic", css_classes=["dim-label"])
-        )
+        version_row.add_suffix(Gtk.Image(icon_name="help-about-symbolic", css_classes=["dim-label"]))
         about_group.add(version_row)
 
         license_row = Adw.ActionRow(
@@ -130,9 +124,7 @@ class SettingsView(Adw.PreferencesPage):
             self._on_disable_confirm_response,
         )
 
-    def _on_disable_confirm_response(
-        self, dialog: Adw.AlertDialog, response: str
-    ) -> None:
+    def _on_disable_confirm_response(self, dialog: Adw.AlertDialog, response: str) -> None:
         if response == "disable":
             Settings.instance().set(_CONFIRM_KEY, False)
         else:
@@ -161,6 +153,7 @@ class SettingsView(Adw.PreferencesPage):
         if response != "clear":
             return
         from sweep.storage import save_history
+
         save_history({"sessions": []})
         self.window.dashboard_view.refresh()
         self.window.show_toast("History cleared.")

@@ -58,9 +58,7 @@ class TestRunPrivilegedClean:
         monkeypatch.setattr("shutil.which", lambda name: f"/usr/bin/{name}")
 
         with patch("sweep.core.privileges.subprocess.run") as mock_run:
-            mock_run.return_value = subprocess.CompletedProcess(
-                args=[], returncode=126, stdout="", stderr=""
-            )
+            mock_run.return_value = subprocess.CompletedProcess(args=[], returncode=126, stdout="", stderr="")
             with pytest.raises(PrivilegeError, match="dismissed by user"):
                 run_privileged_clean(self.ENTRIES)
 
@@ -68,9 +66,7 @@ class TestRunPrivilegedClean:
         monkeypatch.setattr("shutil.which", lambda name: f"/usr/bin/{name}")
 
         with patch("sweep.core.privileges.subprocess.run") as mock_run:
-            mock_run.return_value = subprocess.CompletedProcess(
-                args=[], returncode=127, stdout="", stderr=""
-            )
+            mock_run.return_value = subprocess.CompletedProcess(args=[], returncode=127, stdout="", stderr="")
             with pytest.raises(PrivilegeError, match="denied"):
                 run_privileged_clean(self.ENTRIES)
 
@@ -86,9 +82,7 @@ class TestRunPrivilegedClean:
         monkeypatch.setattr("shutil.which", lambda name: f"/usr/bin/{name}")
 
         with patch("sweep.core.privileges.subprocess.run") as mock_run:
-            mock_run.return_value = subprocess.CompletedProcess(
-                args=[], returncode=0, stdout="not json", stderr=""
-            )
+            mock_run.return_value = subprocess.CompletedProcess(args=[], returncode=0, stdout="not json", stderr="")
             with pytest.raises(PrivilegeError, match="Invalid response"):
                 run_privileged_clean(self.ENTRIES)
 
@@ -101,8 +95,6 @@ class TestRunPrivilegedClean:
         monkeypatch.setattr("shutil.which", lambda name: f"/usr/bin/{name}")
 
         with patch("sweep.core.privileges.subprocess.run") as mock_run:
-            mock_run.return_value = subprocess.CompletedProcess(
-                args=[], returncode=1, stdout="", stderr="some error"
-            )
+            mock_run.return_value = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="some error")
             with pytest.raises(PrivilegeError, match="exit 1"):
                 run_privileged_clean(self.ENTRIES)

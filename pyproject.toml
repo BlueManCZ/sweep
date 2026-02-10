@@ -46,6 +46,10 @@ testpaths = ["tests"]
 
 [dependency-groups]
 dev = [
+    "black>=24.0",
     "pyinstaller>=6.18.0",
     "pytest>=9.0.2",
 ]
+
+[tool.black]
+line-length = 120

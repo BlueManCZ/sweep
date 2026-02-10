@@ -74,12 +74,15 @@ class LoginRecordsPlugin(CleanPlugin):
             size = _WTMP.stat().st_size
             if size > _THRESHOLD:
                 reclaimable = size - _THRESHOLD
-                entries.append(FileEntry(
-                    path=_WTMP,
-                    size_bytes=reclaimable,
-                    description=f"Login records ({size} bytes, keeping 1 MB)",
-                    file_count=1,
-                ))
+                entries.append(
+                    FileEntry(
+                        path=_WTMP,
+                        size_bytes=reclaimable,
+                        description=f"Login records ({size} bytes, keeping 1 MB)",
+                        is_leaf=True,
+                        file_count=1,
+                    )
+                )
                 total = reclaimable
         except OSError:
             log.debug("Cannot stat %s", _WTMP)

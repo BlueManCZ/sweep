@@ -58,9 +58,7 @@ class TrackerCachePlugin(CleanPlugin):
 
     def has_items(self) -> bool:
         try:
-            return any(
-                any(d.iterdir()) for d in self._tracker_dirs()
-            )
+            return any(any(d.iterdir()) for d in self._tracker_dirs())
         except OSError:
             return False
 
@@ -76,12 +74,14 @@ class TrackerCachePlugin(CleanPlugin):
                     else:
                         size, fcount = item.stat().st_size, 1
                     if size > 0:
-                        entries.append(FileEntry(
-                            path=item,
-                            size_bytes=size,
-                            description=f"Tracker: {item.parent.name}/{item.name}",
-                            file_count=fcount,
-                        ))
+                        entries.append(
+                            FileEntry(
+                                path=item,
+                                size_bytes=size,
+                                description=f"Tracker: {item.parent.name}/{item.name}",
+                                file_count=fcount,
+                            )
+                        )
                         total += size
                 except OSError:
                     log.debug("Cannot access: %s", item)

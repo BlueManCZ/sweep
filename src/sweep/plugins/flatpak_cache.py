@@ -27,10 +27,7 @@ class FlatpakCachePlugin(CleanPlugin):
 
     @property
     def description(self) -> str:
-        return (
-            "Removes Flatpak runtimes and extensions that are no longer used by "
-            "any installed application."
-        )
+        return "Removes Flatpak runtimes and extensions that are no longer used by " "any installed application."
 
     @property
     def category(self) -> str:
@@ -68,12 +65,15 @@ class FlatpakCachePlugin(CleanPlugin):
             for line in result.stdout.splitlines():
                 line = line.strip()
                 if line and not line.startswith("Nothing") and "/" in line:
-                    entries.append(FileEntry(
-                        path=Path(f"/var/lib/flatpak/runtime/{line}"),
-                        size_bytes=0,  # Flatpak doesn't report sizes in dry-run
-                        description=f"Unused runtime: {line}",
-                        file_count=1,
-                    ))
+                    entries.append(
+                        FileEntry(
+                            path=Path(f"/var/lib/flatpak/runtime/{line}"),
+                            size_bytes=0,  # Flatpak doesn't report sizes in dry-run
+                            description=f"Unused runtime: {line}",
+                            is_leaf=True,
+                            file_count=1,
+                        )
+                    )
         except (subprocess.CalledProcessError, FileNotFoundError):
             pass
 

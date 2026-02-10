@@ -70,7 +70,9 @@ class TrashPlugin(CleanPlugin):
                         size, fcount = dir_info(item)
                     else:
                         size, fcount = item.stat().st_size, 1
-                    entries.append(FileEntry(path=item, size_bytes=size, description=f"Trash: {item.name}", file_count=fcount))
+                    entries.append(
+                        FileEntry(path=item, size_bytes=size, description=f"Trash: {item.name}", file_count=fcount)
+                    )
                     total += size
                 except OSError:
                     log.debug("Cannot access: %s", item)

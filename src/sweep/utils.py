@@ -94,7 +94,8 @@ def _dir_info_find(path_str: str) -> tuple[int, int]:
     """Walk a directory tree using GNU find (pure C, no Python per-file overhead)."""
     proc = subprocess.run(
         ["find", path_str, "-type", "f", "-printf", "%s\n"],
-        capture_output=True, timeout=60,
+        capture_output=True,
+        timeout=60,
     )
     total = count = 0
     for line in proc.stdout.split(b"\n"):

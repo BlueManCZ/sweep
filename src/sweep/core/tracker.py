@@ -76,10 +76,7 @@ class Tracker:
                 cutoff = None
 
         if cutoff is not None:
-            sessions = [
-                s for s in all_sessions
-                if datetime.fromisoformat(s["timestamp"]) >= cutoff
-            ]
+            sessions = [s for s in all_sessions if datetime.fromisoformat(s["timestamp"]) >= cutoff]
         else:
             sessions = all_sessions
 

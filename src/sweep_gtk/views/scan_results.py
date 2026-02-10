@@ -86,8 +86,10 @@ class ScanResultsView(Gtk.Box):
 
         self._progress_bar_row = Gtk.Box(
             spacing=8,
-            margin_start=12, margin_end=12,
-            margin_top=6, margin_bottom=6,
+            margin_start=12,
+            margin_end=12,
+            margin_top=6,
+            margin_bottom=6,
         )
         self._progress_spinner = Gtk.Spinner()
         self._progress_bar_row.append(self._progress_spinner)
@@ -124,8 +126,7 @@ class ScanResultsView(Gtk.Box):
         self.sort_btn.connect("toggled", self._on_sort_toggled)
         toolbar.append(self.sort_btn)
 
-        toolbar_clamp = Adw.Clamp(maximum_size=600, child=toolbar,
-                                  margin_top=6, margin_bottom=6)
+        toolbar_clamp = Adw.Clamp(maximum_size=600, child=toolbar, margin_top=6, margin_bottom=6)
         self._toolbar_revealer.set_child(toolbar_clamp)
 
         # Scrolled content
@@ -218,10 +219,7 @@ class ScanResultsView(Gtk.Box):
         Settings.instance().set(_SORT_KEY, self._sort_by_size)
 
         # Save expanded state so rows are created already expanded/collapsed
-        self._saved_expanded = {
-            key: row.get_expanded()
-            for key, row in self._expander_rows.items()
-        }
+        self._saved_expanded = {key: row.get_expanded() for key, row in self._expander_rows.items()}
         self.populate(self._scan_results)
         self._saved_expanded = {}
 
@@ -418,13 +416,18 @@ class ScanResultsView(Gtk.Box):
             row.set_activatable_widget(check)
 
             child_checks.append(check)
-            self._entry_checks.append((check, {
-                "plugin_id": result["plugin_id"],
-                "plugin_name": result["plugin_name"],
-                "path": entry["path"],
-                "size_bytes": entry["size_bytes"],
-                "requires_root": result.get("requires_root", False),
-            }))
+            self._entry_checks.append(
+                (
+                    check,
+                    {
+                        "plugin_id": result["plugin_id"],
+                        "plugin_name": result["plugin_name"],
+                        "path": entry["path"],
+                        "size_bytes": entry["size_bytes"],
+                        "requires_root": result.get("requires_root", False),
+                    },
+                )
+            )
 
             module_row.add_row(row)
 
@@ -435,7 +438,9 @@ class ScanResultsView(Gtk.Box):
         return module_row, module_check, child_checks
 
     def _populate_simple_plugin(
-        self, result: dict, cat_group: Adw.PreferencesGroup | None = None,
+        self,
+        result: dict,
+        cat_group: Adw.PreferencesGroup | None = None,
     ) -> None:
         """Populate a standalone plugin row.
 
@@ -467,9 +472,7 @@ class ScanResultsView(Gtk.Box):
             f"{total_files:,} {noun}{'s' if total_files != 1 else ''}  \u00b7  "
             f"{result['file_count']} entr{'ies' if result['file_count'] != 1 else 'y'}"
         )
-        row.add_prefix(
-            Gtk.Image.new_from_icon_name(result.get("icon", "application-x-executable-symbolic"))
-        )
+        row.add_prefix(Gtk.Image.new_from_icon_name(result.get("icon", "application-x-executable-symbolic")))
 
         # Info icon with filesystem path tooltip
         entry_paths = [Path(e["path"]) for e in result["entries"]]
@@ -527,13 +530,18 @@ class ScanResultsView(Gtk.Box):
             check = Gtk.CheckButton(active=True)
             check.set_visible(False)
             hidden_checks.append(check)
-            self._entry_checks.append((check, {
-                "plugin_id": result["plugin_id"],
-                "plugin_name": result["plugin_name"],
-                "path": entry["path"],
-                "size_bytes": entry["size_bytes"],
-                "requires_root": result.get("requires_root", False),
-            }))
+            self._entry_checks.append(
+                (
+                    check,
+                    {
+                        "plugin_id": result["plugin_id"],
+                        "plugin_name": result["plugin_name"],
+                        "path": entry["path"],
+                        "size_bytes": entry["size_bytes"],
+                        "requires_root": result.get("requires_root", False),
+                    },
+                )
+            )
 
         # Wire member checkbox to toggle all hidden entry checks
         member_check.connect("toggled", self._on_module_toggled, hidden_checks)
@@ -542,7 +550,9 @@ class ScanResultsView(Gtk.Box):
         return row, member_check
 
     def _populate_group_result(
-        self, member_results: list[dict], cat_group: Adw.PreferencesGroup | None = None,
+        self,
+        member_results: list[dict],
+        cat_group: Adw.PreferencesGroup | None = None,
     ) -> None:
         """Populate a group of related plugins under a group expander.
 
@@ -555,10 +565,7 @@ class ScanResultsView(Gtk.Box):
 
         # Compute group totals
         group_total_bytes = sum(r["total_bytes"] for r in member_results)
-        group_total_files = sum(
-            sum(e.get("child_count", 1) for e in r["entries"])
-            for r in member_results
-        )
+        group_total_files = sum(sum(e.get("child_count", 1) for e in r["entries"]) for r in member_results)
         group_entry_count = sum(r["file_count"] for r in member_results)
 
         if cat_group is None:
@@ -608,11 +615,7 @@ class ScanResultsView(Gtk.Box):
         for result in empty_results:
             row = Adw.ActionRow()
             row.set_title(result["plugin_name"])
-            row.add_prefix(
-                Gtk.Image.new_from_icon_name(
-                    result.get("icon", "application-x-executable-symbolic")
-                )
-            )
+            row.add_prefix(Gtk.Image.new_from_icon_name(result.get("icon", "application-x-executable-symbolic")))
             row.add_css_class("dim-label")
 
             badge = Gtk.Label(label="Empty")
@@ -692,9 +695,7 @@ class ScanResultsView(Gtk.Box):
 
         self._scan_completed += 1
         self._scan_results.append(result)
-        self._progress_banner.set_title(
-            f"Scanning {self._scan_completed}/{self._scan_total} modules\u2026"
-        )
+        self._progress_banner.set_title(f"Scanning {self._scan_completed}/{self._scan_total} modules\u2026")
         if self._scan_total > 0:
             self._progress_bar.set_fraction(self._scan_completed / self._scan_total)
 
@@ -715,9 +716,7 @@ class ScanResultsView(Gtk.Box):
             self._populate_simple_plugin(result, cat_group)
             # Track for sorted insertion within category
             sort_key = (result.get("sort_order", 50), result["plugin_name"].lower())
-            self._category_children.setdefault(cat_id, []).append(
-                (sort_key, self._expander_rows[result["plugin_id"]])
-            )
+            self._category_children.setdefault(cat_id, []).append((sort_key, self._expander_rows[result["plugin_id"]]))
             self._sort_category_items(cat_id)
         else:
             return  # standalone empty result — nothing to render yet
@@ -732,7 +731,10 @@ class ScanResultsView(Gtk.Box):
             self._update_summary()
 
     def _add_streaming_group_result(
-        self, result: dict, group: dict, cat_id: str,
+        self,
+        result: dict,
+        group: dict,
+        cat_id: str,
     ) -> None:
         """Handle a streaming result that belongs to a plugin group."""
         group_id = group["id"]
@@ -751,29 +753,20 @@ class ScanResultsView(Gtk.Box):
             # Remove from category children tracking
             if cat_id in self._category_children:
                 self._category_children[cat_id] = [
-                    (sk, w) for sk, w in self._category_children[cat_id]
-                    if w is not old_expander
+                    (sk, w) for sk, w in self._category_children[cat_id] if w is not old_expander
                 ]
             # Clean up checks for previously rendered (non-empty) members
             previously_rendered = {r["plugin_id"] for r in actionable}
             if result["total_bytes"] > 0:
                 previously_rendered.discard(result["plugin_id"])
             # Identify stale group_checks via their module check refs
-            rendered_check_ids = {
-                id(c) for c, pid, _ in self._module_checks
-                if pid in previously_rendered
-            }
+            rendered_check_ids = {id(c) for c, pid, _ in self._module_checks if pid in previously_rendered}
             self._group_checks = [
-                (gc, mc) for gc, mc in self._group_checks
-                if not any(id(c) in rendered_check_ids for c in mc)
+                (gc, mc) for gc, mc in self._group_checks if not any(id(c) in rendered_check_ids for c in mc)
             ]
-            self._module_checks = [
-                (c, pid, cc) for c, pid, cc in self._module_checks
-                if pid not in previously_rendered
-            ]
+            self._module_checks = [(c, pid, cc) for c, pid, cc in self._module_checks if pid not in previously_rendered]
             self._entry_checks = [
-                (c, info) for c, info in self._entry_checks
-                if info["plugin_id"] not in previously_rendered
+                (c, info) for c, info in self._entry_checks if info["plugin_id"] not in previously_rendered
             ]
             for pid in previously_rendered:
                 self._clean_status.pop(pid, None)
@@ -801,9 +794,7 @@ class ScanResultsView(Gtk.Box):
         best = actionable[0]
         group_sort_key = (best.get("sort_order", 50), best["plugin_name"].lower())
         group_widget = self._group_widgets[group_id][1]
-        self._category_children.setdefault(cat_id, []).append(
-            (group_sort_key, group_widget)
-        )
+        self._category_children.setdefault(cat_id, []).append((group_sort_key, group_widget))
         self._sort_category_items(cat_id)
 
     def _build_partial_group(
@@ -825,10 +816,7 @@ class ScanResultsView(Gtk.Box):
         group_icon = member_results[0].get("icon", "application-x-executable-symbolic")
 
         group_total_bytes = sum(r["total_bytes"] for r in member_results)
-        group_total_files = sum(
-            sum(e.get("child_count", 1) for e in r["entries"])
-            for r in member_results
-        )
+        group_total_files = sum(sum(e.get("child_count", 1) for e in r["entries"]) for r in member_results)
         group_entry_count = sum(r["file_count"] for r in member_results)
 
         group_row = Adw.ExpanderRow()
@@ -857,10 +845,12 @@ class ScanResultsView(Gtk.Box):
         loading_box = Gtk.Box(spacing=8, valign=Gtk.Align.CENTER)
         spinner = Gtk.Spinner(spinning=True)
         loading_box.append(spinner)
-        loading_box.append(Gtk.Label(
-            label=f"Scanning {remaining} more\u2026",
-            css_classes=["dim-label", "caption"],
-        ))
+        loading_box.append(
+            Gtk.Label(
+                label=f"Scanning {remaining} more\u2026",
+                css_classes=["dim-label", "caption"],
+            )
+        )
         loading_row.add_prefix(loading_box)
         group_row.add_row(loading_row)
 
@@ -924,9 +914,7 @@ class ScanResultsView(Gtk.Box):
                 f"\u00b7 Scanned in {time_str}"
             )
         else:
-            self._progress_banner.set_title(
-                f"Nothing to clean \u00b7 Scanned in {time_str}"
-            )
+            self._progress_banner.set_title(f"Nothing to clean \u00b7 Scanned in {time_str}")
 
         # Rebuild the view via populate() so items within each category are
         # properly sorted (streaming adds them in arrival order).
@@ -941,9 +929,7 @@ class ScanResultsView(Gtk.Box):
         self._clean_completed += 1
         if self._clean_total > 0:
             self._progress_bar.set_fraction(self._clean_completed / self._clean_total)
-        self._progress_banner.set_title(
-            f"Cleaning {self._clean_completed}/{self._clean_total} modules\u2026"
-        )
+        self._progress_banner.set_title(f"Cleaning {self._clean_completed}/{self._clean_total} modules\u2026")
 
         plugin_id = result["plugin_id"]
         status = self._clean_status.get(plugin_id)
@@ -1086,7 +1072,10 @@ class ScanResultsView(Gtk.Box):
     # -- File browser popup --
 
     def _on_view_leaf_entries(
-        self, button: Gtk.Button, path_str: str, items: list[tuple[str, int, str]],
+        self,
+        button: Gtk.Button,
+        path_str: str,
+        items: list[tuple[str, int, str]],
         noun: str = "file",
     ) -> None:
         """Open a popup listing leaf entries (e.g. packages) directly."""
@@ -1101,9 +1090,7 @@ class ScanResultsView(Gtk.Box):
         popup.set_content(toolbar_view)
 
         header = Adw.HeaderBar()
-        header.set_title_widget(
-            Adw.WindowTitle(title=path.name, subtitle=str(path.parent))
-        )
+        header.set_title_widget(Adw.WindowTitle(title=path.name, subtitle=str(path.parent)))
         toolbar_view.add_top_bar(header)
 
         self._populate_file_popup(popup, toolbar_view, items, noun=noun)
@@ -1122,9 +1109,7 @@ class ScanResultsView(Gtk.Box):
         popup.set_content(toolbar_view)
 
         header = Adw.HeaderBar()
-        header.set_title_widget(
-            Adw.WindowTitle(title=path.name, subtitle=str(path.parent))
-        )
+        header.set_title_widget(Adw.WindowTitle(title=path.name, subtitle=str(path.parent)))
         toolbar_view.add_top_bar(header)
 
         spinner = Gtk.Spinner(spinning=True, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
@@ -1136,9 +1121,9 @@ class ScanResultsView(Gtk.Box):
             try:
                 for item in path.rglob("*"):
                     try:
-                        if item.is_file(follow_symlinks=False):
+                        if not item.is_symlink() and item.is_file():
                             try:
-                                size = item.stat(follow_symlinks=False).st_size
+                                size = item.lstat().st_size
                             except OSError:
                                 size = 0
                             files.append((str(item.relative_to(path)), size))
@@ -1226,9 +1211,7 @@ class ScanResultsView(Gtk.Box):
         box.append(icon)
 
         labels_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True)
-        path_label = Gtk.Label(
-            xalign=0, ellipsize=Pango.EllipsizeMode.MIDDLE
-        )
+        path_label = Gtk.Label(xalign=0, ellipsize=Pango.EllipsizeMode.MIDDLE)
         labels_box.append(path_label)
 
         desc_label = Gtk.Label(xalign=0, ellipsize=Pango.EllipsizeMode.END)
@@ -1248,9 +1231,7 @@ class ScanResultsView(Gtk.Box):
         box._size_label = size_label
         list_item.set_child(box)
 
-    def _on_file_item_bind(
-        self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem
-    ) -> None:
+    def _on_file_item_bind(self, factory: Gtk.SignalListItemFactory, list_item: Gtk.ListItem) -> None:
         """Bind file data to a list row."""
         data = list_item.get_item().get_string()
         parts = data.split("\t", 2)
@@ -1276,10 +1257,12 @@ class ScanResultsView(Gtk.Box):
         for check, info in self._entry_checks:
             if not check.get_active():
                 continue
-            entries_by_plugin.setdefault(info["plugin_id"], []).append({
-                "path": info["path"],
-                "size_bytes": info["size_bytes"],
-            })
+            entries_by_plugin.setdefault(info["plugin_id"], []).append(
+                {
+                    "path": info["path"],
+                    "size_bytes": info["size_bytes"],
+                }
+            )
 
         if not entries_by_plugin:
             self.window.show_toast("Nothing selected to clean.")
@@ -1297,8 +1280,7 @@ class ScanResultsView(Gtk.Box):
         for m in sorted(sel["modules"], key=lambda m: m["size"], reverse=True):
             count = m["item_count"]
             lines.append(
-                f"  {m['name']} \u2014 {bytes_to_human(m['size'])} "
-                f"({count} item{'s' if count != 1 else ''})"
+                f"  {m['name']} \u2014 {bytes_to_human(m['size'])} " f"({count} item{'s' if count != 1 else ''})"
             )
 
         body = "The following will be permanently deleted:\n\n"
@@ -1307,10 +1289,7 @@ class ScanResultsView(Gtk.Box):
 
         root_names = sorted(m["name"] for m in sel["modules"] if m["requires_root"])
         if root_names:
-            body += (
-                f"\n\nAdministrator authentication is required for: "
-                f"{', '.join(root_names)}."
-            )
+            body += f"\n\nAdministrator authentication is required for: " f"{', '.join(root_names)}."
 
         show_confirm_dialog(
             self.window,
@@ -1375,13 +1354,11 @@ class ScanResultsView(Gtk.Box):
         if total_errors > 0:
             err_word = "error" if total_errors == 1 else "errors"
             self._progress_banner.set_title(
-                f"Freed {bytes_to_human(total_freed)} from {module_count} {mod_word} "
-                f"with {total_errors} {err_word}"
+                f"Freed {bytes_to_human(total_freed)} from {module_count} {mod_word} " f"with {total_errors} {err_word}"
             )
         else:
             self._progress_banner.set_title(
-                f"Freed {bytes_to_human(total_freed)} from "
-                f"{module_count} {mod_word} successfully"
+                f"Freed {bytes_to_human(total_freed)} from " f"{module_count} {mod_word} successfully"
             )
 
         # Update action bar — swap "Clean Selected" for "Return to Dashboard"

@@ -61,18 +61,10 @@ class SweepWindow(Adw.ApplicationWindow):
         self.settings_view = SettingsView(self)
 
         # Add views to stack
-        self.view_stack.add_titled_with_icon(
-            self.dashboard_view, "dashboard", "Dashboard", "user-home-symbolic"
-        )
-        self.view_stack.add_titled_with_icon(
-            self.modules_view, "modules", "Modules", "application-x-addon-symbolic"
-        )
-        self.view_stack.add_titled_with_icon(
-            self.scan_results_view, "results", "Results", "edit-find-symbolic"
-        )
-        self.view_stack.add_titled_with_icon(
-            self.settings_view, "settings", "Settings", "emblem-system-symbolic"
-        )
+        self.view_stack.add_titled_with_icon(self.dashboard_view, "dashboard", "Dashboard", "user-home-symbolic")
+        self.view_stack.add_titled_with_icon(self.modules_view, "modules", "Modules", "application-x-addon-symbolic")
+        self.view_stack.add_titled_with_icon(self.scan_results_view, "results", "Results", "edit-find-symbolic")
+        self.view_stack.add_titled_with_icon(self.settings_view, "settings", "Settings", "emblem-system-symbolic")
 
         main_box.append(self.view_stack)
         main_box.append(switcher_bar)

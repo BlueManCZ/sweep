@@ -74,8 +74,7 @@ class SweepDBusService(ServiceInterface):
                 "file_count": len(r.entries),
                 "summary": r.summary,
                 "entries": [
-                    {"path": str(e.path), "size_bytes": e.size_bytes, "description": e.description}
-                    for e in r.entries
+                    {"path": str(e.path), "size_bytes": e.size_bytes, "description": e.description} for e in r.entries
                 ],
             }
             for r in results
