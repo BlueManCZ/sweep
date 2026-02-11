@@ -121,8 +121,10 @@ class TestSweepEngine:
         assert len(results) == 2
         by_id = {r.plugin_id: r for r in results}
         assert by_id["good"].total_bytes > 0
+        assert by_id["good"].error == ""
         assert by_id["bad"].total_bytes == 0
         assert by_id["bad"].entries == []
+        assert "scan failed" in by_id["bad"].error.lower()
 
     def test_clean_handles_plugin_errors(self):
         registry = PluginRegistry()
@@ -278,7 +280,9 @@ class TestSweepEngine:
         assert len(received) == 2
         by_id = {r.plugin_id: r for r in received}
         assert by_id["good"].total_bytes > 0
+        assert by_id["good"].error == ""
         assert by_id["bad"].total_bytes == 0
+        assert by_id["bad"].error != ""
 
     def test_clean_on_result_callback(self, engine):
         """on_result fires for each cleaned plugin."""

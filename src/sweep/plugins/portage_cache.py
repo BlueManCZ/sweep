@@ -70,9 +70,9 @@ def _calc_depclean_candidates() -> list[str]:
     from portage._sets import load_default_config
     from portage._sets.base import InternalPackageSet
 
-    settings = portage.settings
     trees = portage.create_trees()
-    eroot = settings["EROOT"]
+    eroot = next(iter(trees))
+    settings = trees[eroot]["vartree"].settings
 
     setconfig = load_default_config(settings, trees[eroot])
     root_config = RootConfig(settings, trees[eroot], setconfig)

@@ -281,9 +281,10 @@ class ScanResultsView(Gtk.Box):
         self._groups.clear()
 
         actionable = [r for r in results if r["total_bytes"] > 0]
-        empty = [r for r in results if r["total_bytes"] == 0]
+        errored = [r for r in results if r.get("error")]
+        empty = [r for r in results if r["total_bytes"] == 0 and not r.get("error")]
 
-        if not actionable and not empty:
+        if not actionable and not empty and not errored:
             self._empty_group = self._wrap_in_group(self.empty_status)
             self.prefs_page.add(self._empty_group)
             self._groups.append(self._empty_group)
@@ -311,6 +312,9 @@ class ScanResultsView(Gtk.Box):
 
         if empty and self._show_empty_results:
             self._populate_empty_plugins(empty)
+
+        if errored:
+            self._populate_errored_plugins(errored)
 
         has_actionable = bool(actionable)
         self.action_bar.set_visible(has_actionable)
@@ -665,6 +669,28 @@ class ScanResultsView(Gtk.Box):
 
             group.add(row)
 
+    def _populate_errored_plugins(self, errored_results: list[dict]) -> None:
+        """Show plugins that crashed during scanning."""
+        group = Adw.PreferencesGroup(
+            title="Scan Errors",
+            description="These modules encountered errors during scanning",
+        )
+        self.prefs_page.add(group)
+        self._groups.append(group)
+
+        for result in errored_results:
+            row = Adw.ActionRow()
+            row.set_title(result["plugin_name"])
+            row.set_subtitle(result.get("error", "Unknown error"))
+            row.add_prefix(Gtk.Image.new_from_icon_name("dialog-warning-symbolic"))
+
+            badge = Gtk.Label(label="Error")
+            badge.add_css_class("warning")
+            badge.add_css_class("caption")
+            row.add_suffix(badge)
+
+            group.add(row)
+
     # -- Streaming scan --
 
     def begin_streaming_scan(
@@ -739,9 +765,10 @@ class ScanResultsView(Gtk.Box):
             self._progress_bar.set_fraction(self._scan_completed / self._scan_total)
 
         group = result.get("group")
+        has_error = bool(result.get("error"))
         is_empty = result["total_bytes"] == 0
 
-        if is_empty:
+        if is_empty and not has_error:
             self._empty_results.append(result)
 
         cat_id = result.get("category", "user")
@@ -966,16 +993,22 @@ class ScanResultsView(Gtk.Box):
 
         total = sum(r["total_bytes"] for r in self._scan_results)
         module_count = sum(1 for r in self._scan_results if r["total_bytes"] > 0)
+        error_count = sum(1 for r in self._scan_results if r.get("error"))
         time_str = _format_elapsed(elapsed)
 
         if total > 0:
-            self._progress_banner.set_title(
+            banner_text = (
                 f"Found {bytes_to_human(total)} in {module_count} "
                 f"{'module' if module_count == 1 else 'modules'} "
                 f"\u00b7 Scanned in {time_str}"
             )
         else:
-            self._progress_banner.set_title(f"Nothing to clean \u00b7 Scanned in {time_str}")
+            banner_text = f"Nothing to clean \u00b7 Scanned in {time_str}"
+
+        if error_count > 0:
+            banner_text += f" \u00b7 {error_count} {'error' if error_count == 1 else 'errors'}"
+
+        self._progress_banner.set_title(banner_text)
 
         # Rebuild the view via populate() so items within each category are
         # properly sorted (streaming adds them in arrival order).

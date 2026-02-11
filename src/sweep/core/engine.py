@@ -100,9 +100,13 @@ class SweepEngine:
                     on_result(result)
                 if on_progress:
                     on_progress(plugin.id, "done")
-            except Exception:
+            except Exception as exc:
                 log.exception("Plugin '%s' failed during scan", plugin.id)
-                result = ScanResult(plugin_id=plugin.id, plugin_name=plugin.name)
+                result = ScanResult(
+                    plugin_id=plugin.id,
+                    plugin_name=plugin.name,
+                    error=f"Scan failed: {exc}",
+                )
                 results.append(result)
                 if on_result:
                     on_result(result)
@@ -135,9 +139,13 @@ class SweepEngine:
                     on_result(result)
                 if on_progress:
                     on_progress(plugin.id, "done")
-            except Exception:
+            except Exception as exc:
                 log.exception("Plugin '%s' failed during scan", plugin.id)
-                result = ScanResult(plugin_id=plugin.id, plugin_name=plugin.name)
+                result = ScanResult(
+                    plugin_id=plugin.id,
+                    plugin_name=plugin.name,
+                    error=f"Scan failed: {exc}",
+                )
                 with lock:
                     results.append(result)
                 if on_result:

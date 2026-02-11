@@ -12,7 +12,7 @@ from types import ModuleType
 
 from sweep.models.plugin import CleanPlugin, MultiDirPlugin, SimpleCacheDirPlugin
 from sweep.core.registry import PluginRegistry
-from sweep.utils import xdg_config_home, xdg_data_home
+from sweep.utils import ensure_system_python_paths, xdg_config_home, xdg_data_home
 
 log = logging.getLogger(__name__)
 
@@ -94,6 +94,8 @@ def load_plugins(registry: PluginRegistry) -> None:
 
     Searches in order: built-in, system-wide, user-local, config-specified.
     """
+    ensure_system_python_paths()
+
     plugin_classes: list[type[CleanPlugin]] = []
 
     # 1. Built-in plugins

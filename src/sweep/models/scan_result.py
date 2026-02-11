@@ -32,3 +32,4 @@ class ScanResult:
     entries: list[FileEntry] = field(default_factory=list)
     total_bytes: int = 0
     summary: str = ""
+    error: str = ""

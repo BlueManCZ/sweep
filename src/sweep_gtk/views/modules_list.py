@@ -628,12 +628,14 @@ class _GroupRow(Adw.ExpanderRow):
     def sync_master_from_members(self) -> None:
         """Set master switch based on member states (no signal recursion)."""
         active_members = [r for r in self.member_rows.values() if r.plugin_info["available"]]
-        if not active_members:
-            return
-
-        any_on = any(r.switch.get_active() for r in active_members)
         self._updating_master = True
-        self.master_switch.set_active(any_on)
+        if not active_members:
+            self.master_switch.set_active(False)
+            self.master_switch.set_sensitive(False)
+        else:
+            any_on = any(r.switch.get_active() for r in active_members)
+            self.master_switch.set_active(any_on)
+            self.master_switch.set_sensitive(True)
         self._updating_master = False
 
 

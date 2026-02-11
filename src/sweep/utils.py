@@ -6,12 +6,31 @@ import logging
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 from sweep.models.clean_result import CleanResult
 from sweep.models.scan_result import FileEntry
 
 log = logging.getLogger(__name__)
+
+
+def ensure_system_python_paths() -> None:
+    """Add system Python paths to sys.path if not already present.
+
+    Some plugins depend on system packages (e.g. portage, gentoolkit)
+    installed via the distro package manager into the global site-packages.
+    Inside a PyInstaller bundle these paths are absent, so both the system
+    packages and the stdlib modules they transitively import would fail.
+
+    Call this once before loading plugins so that any plugin can freely
+    import system libraries.
+    """
+    v = sys.version_info
+    base = f"/usr/lib/python{v.major}.{v.minor}"
+    for path in [base, f"{base}/lib-dynload", f"{base}/site-packages"]:
+        if path not in sys.path and Path(path).is_dir():
+            sys.path.append(path)
 
 
 def has_command(name: str) -> bool:

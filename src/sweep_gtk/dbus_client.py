@@ -92,6 +92,8 @@ class SweepClient:
                 for e in r.entries
             ],
         }
+        if r.error:
+            entry["error"] = r.error
         if plugin and plugin.group:
             entry["group"] = {"id": plugin.group.id, "name": plugin.group.name}
         return entry

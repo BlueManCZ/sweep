@@ -39,3 +39,27 @@ jobs:
 
       - name: Run tests
         run: make test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev libadwaita-1-dev libgirepository1.0-dev
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Build with PyInstaller
+        run: make build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweep-gtk
+          path: dist/sweep-gtk
