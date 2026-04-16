@@ -71,3 +71,15 @@ class PluginRegistry:
     def get_group_plugins(self, group_id: str) -> list[CleanPlugin]:
         """Get all plugins belonging to a specific group."""
         return [p for p in self._plugins.values() if p.group is not None and p.group.id == group_id]
+
+    def get_managed_cache_names(self, exclude_id: str | None = None) -> set[str]:
+        """Collect all cache directory names managed by registered plugins.
+
+        Args:
+            exclude_id: Plugin ID to exclude (typically the caller itself).
+        """
+        names: set[str] = set()
+        for plugin in self._plugins.values():
+            if plugin.id != exclude_id:
+                names |= plugin.managed_cache_names
+        return names

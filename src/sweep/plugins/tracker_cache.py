@@ -29,6 +29,10 @@ class TrackerCachePlugin(CleanPlugin):
     sort_order = 21
     icon = "system-search-symbolic"
 
+    @property
+    def managed_cache_names(self) -> set[str]:
+        return set(_TRACKER_DIRS)
+
     def _tracker_dirs(self) -> list[Path]:
         cache = xdg_cache_home()
         return [cache / name for name in _TRACKER_DIRS if (cache / name).is_dir()]

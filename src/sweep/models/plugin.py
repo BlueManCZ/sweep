@@ -82,6 +82,16 @@ class CleanPlugin(ABC):
     _count_files: bool = False
     """Whether to count individual files inside directories during clean."""
 
+    @property
+    def managed_cache_names(self) -> set[str]:
+        """Top-level directory names under $XDG_CACHE_HOME managed by this plugin.
+
+        Used by the User Cache plugin to avoid double-counting directories
+        that are already handled by a dedicated plugin.  Subclasses that
+        clean directories under ~/.cache should override this property.
+        """
+        return set()
+
     @abstractmethod
     def scan(self) -> ScanResult:
         """Scan for cleanable files. MUST NOT delete anything."""
@@ -146,6 +156,10 @@ class SimpleCacheDirPlugin(CleanPlugin, ABC):
     def _label(self) -> str:
         """Human-readable label for file descriptions. Defaults to name."""
         return self.name
+
+    @property
+    def managed_cache_names(self) -> set[str]:
+        return {self._cache_dir_name.split("/")[0]}
 
     @property
     def category(self) -> str:
@@ -222,6 +236,20 @@ class MultiDirPlugin(CleanPlugin, ABC):
     def _recreate_dirs(self) -> bool:
         """Whether to recreate directories after cleaning."""
         return True
+
+    @property
+    def managed_cache_names(self) -> set[str]:
+        from sweep.utils import xdg_cache_home
+
+        cache = xdg_cache_home()
+        names: set[str] = set()
+        for d in self._cache_dirs:
+            try:
+                rel = d.relative_to(cache)
+                names.add(rel.parts[0])
+            except (ValueError, IndexError):
+                pass
+        return names
 
     @property
     def unavailable_reason(self) -> str | None:

@@ -119,4 +119,13 @@ def load_plugins(registry: PluginRegistry) -> None:
         except Exception:
             log.exception("Failed to instantiate plugin: %s", cls.__name__)
 
+    # Inject managed cache names into the UserCachePlugin so it can
+    # dynamically exclude directories handled by other plugins.
+    from sweep.plugins.user_cache import UserCachePlugin
+
+    for plugin in registry:
+        if isinstance(plugin, UserCachePlugin):
+            plugin._managed_by_plugins = registry.get_managed_cache_names(exclude_id=plugin.id)
+            break
+
     log.info("Loaded %d plugins", len(registry))

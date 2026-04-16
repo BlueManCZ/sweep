@@ -21,58 +21,6 @@ _EXCLUDE_DIRS = {
     "gegl-0.4",
 }
 
-# Handled by dedicated plugins
-_PLUGIN_DIRS = {
-    "thumbnails",
-    "mozilla",
-    "chromium",
-    "google-chrome",
-    "opera",
-    "zen",
-    "BraveSoftware",
-    "microsoft-edge",
-    "electron",
-    "darktable",
-    "Google",
-    "JetBrains",
-    "pip",
-    "pipenv",
-    "uv",
-    "pypoetry",
-    "virtualenv",
-    ".vpython-root",
-    "yarn",
-    "pnpm",
-    "typescript",
-    "biome",
-    "black",
-    "node-gyp",
-    "nvidia",
-    "mesa_shader_cache",
-    "mesa_shader_cache_db",
-    "ms-playwright",
-    "Cypress",
-    "electron-builder",
-    "spotify",
-    "github-copilot",
-    "strawberry",
-    "unity3d",
-    "whatsapp-for-linux",
-    "wine",
-    "winetricks",
-    "protontricks",
-    "thunderbird",
-    "evolution",
-    "geary",
-    "epiphany",
-    "pylint",
-    "tracker",
-    "tracker3",
-}
-
-# Prefixes handled by dedicated plugins (directories with dynamic suffixes)
-_PLUGIN_DIR_PREFIXES = ("vpython-root.",)
-
 
 def _has_any_file(path: Path | str) -> bool:
     """Check if a directory tree contains any regular file with non-zero size."""
@@ -95,11 +43,6 @@ def _has_any_file(path: Path | str) -> bool:
     return False
 
 
-def _is_excluded(name: str) -> bool:
-    """Check if a cache directory should be skipped."""
-    return name in _EXCLUDE_DIRS or name in _PLUGIN_DIRS or name.startswith(_PLUGIN_DIR_PREFIXES)
-
-
 class UserCachePlugin(CleanPlugin):
     """Cleans user cache directory (~/.cache) excluding active app caches."""
 
@@ -115,6 +58,14 @@ class UserCachePlugin(CleanPlugin):
     risk_level = "moderate"
     icon = "user-home-symbolic"
 
+    # Populated by plugin_loader after all plugins are registered.
+    # Contains top-level cache dir names managed by dedicated plugins.
+    _managed_by_plugins: set[str] = set()
+
+    def _is_excluded(self, name: str) -> bool:
+        """Check if a cache directory should be skipped."""
+        return name in _EXCLUDE_DIRS or name in self._managed_by_plugins
+
     def _cache_dir(self) -> Path:
         return xdg_cache_home()
 
@@ -127,7 +78,7 @@ class UserCachePlugin(CleanPlugin):
     def has_items(self) -> bool:
         try:
             for item in self._cache_dir().iterdir():
-                if _is_excluded(item.name):
+                if self._is_excluded(item.name):
                     continue
                 try:
                     if item.is_dir():
@@ -147,7 +98,7 @@ class UserCachePlugin(CleanPlugin):
         total = 0
 
         for item in sorted(cache_dir.iterdir()):
-            if _is_excluded(item.name):
+            if self._is_excluded(item.name):
                 continue
             try:
                 if item.is_dir():

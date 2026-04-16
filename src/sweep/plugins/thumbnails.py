@@ -26,6 +26,10 @@ class ThumbnailsPlugin(CleanPlugin):
     sort_order = 20
     icon = "image-x-generic-symbolic"
 
+    @property
+    def managed_cache_names(self) -> set[str]:
+        return {"thumbnails"}
+
     def _thumb_dir(self) -> Path:
         return xdg_cache_home() / "thumbnails"
 

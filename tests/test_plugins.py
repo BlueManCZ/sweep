@@ -261,6 +261,9 @@ class TestElectronCachePlugin:
     def test_user_cache_excludes_electron_dirs(self, fake_electron):
         """Ensure user_cache plugin skips both electron directories."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = (
+            ElectronCachePlugin().managed_cache_names | ElectronBuilderCachePlugin().managed_cache_names
+        )
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "electron" not in names
@@ -325,6 +328,7 @@ class TestDarktableCachePlugin:
     def test_user_cache_excludes_darktable(self, fake_darktable):
         """Ensure user_cache plugin skips the darktable directory."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = DarktableCachePlugin().managed_cache_names
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "darktable" not in names
@@ -437,6 +441,7 @@ class TestGoogleCachePlugin:
     def test_user_cache_excludes_google(self, fake_google):
         """Ensure user_cache plugin skips the Google directory."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = GoogleXdgCachePlugin().managed_cache_names
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "Google" not in names
@@ -505,6 +510,7 @@ class TestJetBrainsCachePlugin:
     def test_user_cache_excludes_jetbrains(self, fake_jetbrains):
         """Ensure user_cache plugin skips the JetBrains directory."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = JetBrainsCachePlugin().managed_cache_names
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "JetBrains" not in names
@@ -608,6 +614,9 @@ class TestE2eTestingCachePlugin:
     def test_user_cache_excludes_e2e_dirs(self, fake_e2e):
         """Ensure user_cache plugin skips both E2E cache directories."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = (
+            PlaywrightCachePlugin().managed_cache_names | CypressCachePlugin().managed_cache_names
+        )
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "ms-playwright" not in names
@@ -677,6 +686,7 @@ class TestSpotifyCachePlugin:
     def test_user_cache_excludes_spotify(self, fake_spotify):
         """Ensure user_cache plugin skips the spotify directory."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = SpotifyCachePlugin().managed_cache_names
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "spotify" not in names
@@ -745,6 +755,7 @@ class TestCopilotCachePlugin:
     def test_user_cache_excludes_copilot(self, fake_copilot):
         """Ensure user_cache plugin skips the github-copilot directory."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = CopilotCachePlugin().managed_cache_names
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "github-copilot" not in names
@@ -813,6 +824,7 @@ class TestStrawberryCachePlugin:
     def test_user_cache_excludes_strawberry(self, fake_strawberry):
         """Ensure user_cache plugin skips the strawberry directory."""
         plugin = UserCachePlugin()
+        plugin._managed_by_plugins = StrawberryCachePlugin().managed_cache_names
         result = plugin.scan()
         names = {e.path.name for e in result.entries}
         assert "strawberry" not in names

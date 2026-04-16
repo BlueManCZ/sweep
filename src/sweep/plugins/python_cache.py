@@ -103,6 +103,18 @@ class PylintCachePlugin(SimpleCacheDirPlugin):
     _cache_dir_name = "pylint"
 
 
+class PyInstallerCachePlugin(SimpleCacheDirPlugin):
+    """Cleans PyInstaller cache."""
+
+    id = "pyinstaller_cache"
+    name = "PyInstaller"
+    description = "PyInstaller build cache"
+    category = "development"
+    icon = "system-software-install-symbolic"
+    group = _GROUP
+    _cache_dir_name = "pyinstaller"
+
+
 class VpythonCachePlugin(MultiDirPlugin):
     """Cleans Chromium depot_tools vpython virtual environment cache."""
 
