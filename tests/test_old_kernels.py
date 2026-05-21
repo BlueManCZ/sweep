@@ -16,6 +16,7 @@ from sweep.plugins.old_kernels import (
     _protected_versions,
     _boot_keep_versions,
     _modules_keep_versions,
+    _portage_owned_sources,
     _sources_keep_names,
 )
 
@@ -61,6 +62,21 @@ def _make_sources(usr_src: Path, version: str, size: int = 8192) -> Path:
     (d / "Makefile").write_bytes(b"M" * size)
     (d / ".config").write_bytes(b"C" * (size // 4))
     return d
+
+
+def _make_portage_pkg(vardb: Path, pkg: str, owns: Path | None = None) -> None:
+    """Create a fake /var/db/pkg/sys-kernel/<pkg>/CONTENTS file.
+
+    When ``owns`` is given, the CONTENTS claims ownership of that path
+    just as Portage records it for an installed ``*-sources`` package.
+    """
+    pkg_dir = vardb / "sys-kernel" / pkg
+    pkg_dir.mkdir(parents=True, exist_ok=True)
+    lines: list[str] = []
+    if owns is not None:
+        lines.append(f"dir {owns}")
+        lines.append(f"obj {owns}/Makefile 0123456789abcdef0123456789abcdef 1700000000")
+    (pkg_dir / "CONTENTS").write_text("\n".join(lines) + "\n")
 
 
 # ---------------------------------------------------------------------------
@@ -623,6 +639,7 @@ class TestGentooSources:
             patch("sweep.plugins.old_kernels._BOOT_DIR", boot),
             patch("sweep.plugins.old_kernels._MODULES_DIR", modules),
             patch("sweep.plugins.old_kernels._SOURCES_DIR", usr_src),
+            patch("sweep.plugins.old_kernels._PORTAGE_DB_DIR", tmp_path / "novardb"),
             patch("platform.release", return_value=self.RUNNING),
         ):
             yield usr_src
@@ -716,6 +733,7 @@ class TestSourcesWithMultipleBootKernels:
             patch("sweep.plugins.old_kernels._BOOT_DIR", boot),
             patch("sweep.plugins.old_kernels._MODULES_DIR", modules),
             patch("sweep.plugins.old_kernels._SOURCES_DIR", usr_src),
+            patch("sweep.plugins.old_kernels._PORTAGE_DB_DIR", tmp_path / "novardb"),
             patch("platform.release", return_value=self.RUNNING),
         ):
             yield usr_src
@@ -757,6 +775,7 @@ class TestSourcesSingleKernel:
             patch("sweep.plugins.old_kernels._BOOT_DIR", boot),
             patch("sweep.plugins.old_kernels._MODULES_DIR", modules),
             patch("sweep.plugins.old_kernels._SOURCES_DIR", usr_src),
+            patch("sweep.plugins.old_kernels._PORTAGE_DB_DIR", tmp_path / "novardb"),
             patch("platform.release", return_value=self.RUNNING),
         ):
             yield usr_src
@@ -793,6 +812,7 @@ class TestSourcesSymlinkProtection:
             patch("sweep.plugins.old_kernels._BOOT_DIR", boot),
             patch("sweep.plugins.old_kernels._MODULES_DIR", modules),
             patch("sweep.plugins.old_kernels._SOURCES_DIR", usr_src),
+            patch("sweep.plugins.old_kernels._PORTAGE_DB_DIR", tmp_path / "novardb"),
             patch("platform.release", return_value=self.RUNNING),
         ):
             yield usr_src
@@ -805,3 +825,78 @@ class TestSourcesSymlinkProtection:
         assert "linux-6.12.58-gentoo" not in deleted
         # Orphan is removed
         assert "linux-6.6.38-gentoo" in deleted
+
+
+class TestSourcesPortageOwnership:
+    """A freshly emerged *-sources package is kept before it is built.
+
+    Reproduces the real bug: ``gentoo-sources-6.18.32-r2`` is installed
+    but not yet compiled, so it has no /boot image, no /lib/modules dir,
+    and the /usr/src/linux symlink still points at the running kernel.
+    """
+
+    RUNNING = "6.18.12-gentoo-x86_64"
+
+    @pytest.fixture
+    def fresh_sources(self, tmp_path):
+        boot = tmp_path / "boot"
+        boot.mkdir()
+        modules = tmp_path / "lib" / "modules"
+        modules.mkdir(parents=True)
+        usr_src = tmp_path / "usr" / "src"
+        usr_src.mkdir(parents=True)
+        vardb = tmp_path / "var" / "db" / "pkg"
+        vardb.mkdir(parents=True)
+
+        # Running kernel: built, in /boot, symlink points here
+        _make_kernel(boot, "6.18.12-gentoo-x86_64")
+        _make_modules(modules, "6.18.12-gentoo-x86_64")
+        running_src = _make_sources(usr_src, "6.18.12-gentoo")
+        (usr_src / "linux").symlink_to(running_src)
+
+        # Freshly emerged source: owned by Portage but not yet built
+        fresh = _make_sources(usr_src, "6.18.32-gentoo-r2")
+        # Truly orphaned tree: no installed package owns it
+        _make_sources(usr_src, "6.6.58-gentoo-r1")
+
+        _make_portage_pkg(vardb, "gentoo-sources-6.18.12", owns=running_src)
+        _make_portage_pkg(vardb, "gentoo-sources-6.18.32-r2", owns=fresh)
+        # linux-headers lives in sys-kernel but is not a kernel source tree
+        _make_portage_pkg(vardb, "linux-headers-6.18", owns=usr_src / "linux-headers-6.18")
+
+        with (
+            patch("sweep.plugins.old_kernels._BOOT_DIR", boot),
+            patch("sweep.plugins.old_kernels._MODULES_DIR", modules),
+            patch("sweep.plugins.old_kernels._SOURCES_DIR", usr_src),
+            patch("sweep.plugins.old_kernels._PORTAGE_DB_DIR", vardb),
+            patch("platform.release", return_value=self.RUNNING),
+        ):
+            yield usr_src
+
+    def test_owned_sources_detected(self, fresh_sources):
+        owned = _portage_owned_sources()
+
+        assert "linux-6.18.32-gentoo-r2" in owned
+        assert "linux-6.18.12-gentoo" in owned
+        # linux-headers is not a kernel source tree
+        assert "linux-headers-6.18" not in owned
+
+    def test_keep_names_includes_owned_source(self, fresh_sources):
+        keep = _sources_keep_names()
+        assert "linux-6.18.32-gentoo-r2" in keep
+
+    def test_scan_does_not_flag_owned_source(self, fresh_sources):
+        result = OldKernelSourcesPlugin().scan()
+        deleted = {e.path.name for e in result.entries}
+
+        assert "linux-6.18.32-gentoo-r2" not in deleted
+
+    def test_scan_still_removes_unowned_orphan(self, fresh_sources):
+        result = OldKernelSourcesPlugin().scan()
+        deleted = {e.path.name for e in result.entries}
+
+        assert deleted == {"linux-6.6.58-gentoo-r1"}
+
+    def test_no_portage_db_returns_empty(self, tmp_path):
+        with patch("sweep.plugins.old_kernels._PORTAGE_DB_DIR", tmp_path / "nodb"):
+            assert _portage_owned_sources() == set()

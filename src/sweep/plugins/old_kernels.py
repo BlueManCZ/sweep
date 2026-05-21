@@ -15,6 +15,7 @@ log = logging.getLogger(__name__)
 _BOOT_DIR = Path("/boot")
 _MODULES_DIR = Path("/lib/modules")
 _SOURCES_DIR = Path("/usr/src")
+_PORTAGE_DB_DIR = Path("/var/db/pkg")
 
 _GROUP = PluginGroup("kernel", "Linux Kernel", "Old kernel images, modules, and sources")
 
@@ -83,16 +84,58 @@ def _modules_keep_versions() -> set[str]:
     return keep
 
 
-def _is_kernel_source_dir(path: Path) -> bool:
-    """Check if a path is a kernel source directory (linux-<version>).
+def _is_kernel_source_name(name: str) -> bool:
+    """Check if a directory name is a kernel source tree (linux-<version>).
 
     Matches ``linux-6.12.58-gentoo`` but not ``linux-firmware`` or
     ``linux-headers-6.12.58``.
     """
-    if not path.is_dir() or not path.name.startswith("linux-"):
+    if not name.startswith("linux-"):
         return False
-    version = path.name.removeprefix("linux-")
+    version = name.removeprefix("linux-")
     return bool(version) and version[0].isdigit()
+
+
+def _is_kernel_source_dir(path: Path) -> bool:
+    """Check if a path is an existing kernel source directory."""
+    return path.is_dir() and _is_kernel_source_name(path.name)
+
+
+def _portage_owned_sources() -> set[str]:
+    """Source directory names in /usr/src owned by an installed package.
+
+    Scans the Portage installed-package database
+    (``/var/db/pkg/sys-kernel/*/CONTENTS``) for entries directly under
+    ``/usr/src``.  A freshly emerged ``*-sources`` package owns its
+    source tree before any kernel image, module dir, or symlink exists,
+    so without this check such trees are wrongly flagged as orphaned.
+    """
+    kernel_db = _PORTAGE_DB_DIR / "sys-kernel"
+    if not kernel_db.is_dir():
+        return set()
+
+    owned: set[str] = set()
+    try:
+        pkg_dirs = list(kernel_db.iterdir())
+    except OSError:
+        return owned
+
+    for pkg_dir in pkg_dirs:
+        try:
+            lines = (pkg_dir / "CONTENTS").read_text().splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            # CONTENTS format: "<type> <path> [extra...]", e.g.
+            # "dir /usr/src/linux-6.18.32-gentoo-r2"
+            parts = line.split(maxsplit=2)
+            if len(parts) < 2:
+                continue
+            path = Path(parts[1])
+            if path.parent == _SOURCES_DIR and _is_kernel_source_name(path.name):
+                owned.add(path.name)
+
+    return owned
 
 
 def _sources_keep_names() -> set[str]:
@@ -113,6 +156,10 @@ def _sources_keep_names() -> set[str]:
                 protected.add(f.name.removeprefix("vmlinuz-"))
 
     keep: set[str] = set()
+
+    # Keep source trees still owned by an installed Portage package,
+    # even if no kernel image has been built from them yet.
+    keep |= _portage_owned_sources()
 
     # Always keep the /usr/src/linux symlink target
     linux_symlink = _SOURCES_DIR / "linux"
