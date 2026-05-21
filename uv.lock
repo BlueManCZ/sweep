@@ -456,15 +456,13 @@ source = { editable = "." }
 dependencies = [
     { name = "click" },
     { name = "dbus-next" },
+    { name = "pygobject" },
 ]
 
 [package.optional-dependencies]
 dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
-]
-gtk = [
-    { name = "pygobject" },
 ]
 
 [package.dev-dependencies]
@@ -478,11 +476,11 @@ dev = [
 requires-dist = [
     { name = "click", specifier = ">=8.0" },
     { name = "dbus-next", specifier = ">=0.2.3" },
-    { name = "pygobject", marker = "extra == 'gtk'", specifier = ">=3.42" },
+    { name = "pygobject", specifier = ">=3.42" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0" },
     { name = "pytest-cov", marker = "extra == 'dev'" },
 ]
-provides-extras = ["gtk", "dev"]
+provides-extras = ["dev"]
 
 [package.metadata.requires-dev]
 dev = [

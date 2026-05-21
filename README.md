@@ -20,15 +20,21 @@ covering browsers, package managers, development tools, and more.
 
 Requires **Python 3.10+** and [uv](https://docs.astral.sh/uv/).
 
+System dependencies for the GTK interface (Debian/Ubuntu names; adapt for your
+distro):
+
+```
+libcairo2-dev libgirepository-2.0-dev libgtk-4-dev libadwaita-1-dev
+```
+
+Then:
+
 ```bash
 # Clone and install
 git clone https://github.com/BlueManCZ/sweep.git
 cd sweep
 uv sync
 ```
-
-For the GTK interface, you also need **GTK4**, **libadwaita**, and **PyGObject**
-installed as system packages.
 
 ## Usage
 
